@@ -1,8 +1,11 @@
 <?php
 
+use App\Admin\Controllers\CategoryController;
+use App\Admin\Controllers\EmployeeController;
+use App\Admin\Controllers\ServiceController;
+use App\Admin\Controllers\WorkingHoursController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\WorkingHoursController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -20,9 +23,19 @@ Route::get('/', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');*/
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
-    Route::get('admin/employees', [AdminController::class, 'index'])->name('admin.employees.index');
+Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+
+    Route::get('employee', [EmployeeController::class, 'index'])->name('admin.employee.index');
+    Route::get('employee/create', [EmployeeController::class, 'create'])->name('admin.employee.create');
+    Route::post('employee', [EmployeeController::class, 'store'])->name('admin.employee.store');
+    Route::get('employee/{employee}/edit', [EmployeeController::class, 'edit'])->name('admin.employee.edit');
+
+    Route::post('user/{id}/working-hours', [WorkingHoursController::class, 'store'])->name('admin.working-hours.store');
+    Route::post('user/{id}/working-hours/apply-every-day', [WorkingHoursController::class, 'setEveryDay'])->name('admin.working-hours.every-day');
+
+    Route::get('service', [ServiceController::class, 'index'])->name('admin.service.index');
+    Route::post('category', [CategoryController::class, 'store'])->name('admin.category.store');
 });
 
 /*Route::get('/employee', function () {

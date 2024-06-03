@@ -21,6 +21,8 @@ class RolesAndPermissionsSeeder extends Seeder
         Permission::create(['name' => 'manage bookings']);
 
         $adminRole->givePermissionTo('manage employees');
+        $adminRole->givePermissionTo('manage bookings');
+
         $employeeRole->givePermissionTo('manage bookings');
     }
 }

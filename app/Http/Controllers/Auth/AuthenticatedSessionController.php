@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
+use Laravel\Telescope\IncomingEntry;
+use Laravel\Telescope\Telescope;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -34,10 +36,14 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         if (Auth::getUser()->hasRole('admin')) {
-            return redirect()->intended(route('admin.dashboard', absolute: false));
+             return redirect()->intended(route('admin.dashboard', absolute: false));
         }
 
-        return redirect()->intended(route('employee.profile', absolute: false));
+        if (Auth::getUser()->hasRole('employee')) {
+            return redirect()->intended(route('employee.dashboard', absolute: false));
+        }
+
+        return redirect('/');
     }
 
     /**
