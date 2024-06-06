@@ -1,33 +1,10 @@
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.jsx";
-import {Head, Link, useForm, usePage} from "@inertiajs/react";
-import WorkingHours from "@/Pages/Admin/Employee/Partials/WorkingHours.jsx";
-import PrimaryButton from "@/Components/PrimaryButton.jsx";
-import TextInput from "@/Components/TextInput.jsx";
+import {Head, Link, usePage} from "@inertiajs/react";
+import {lazy, Suspense, useState} from "react";
+import {Box, Paper, Tab, Tabs} from "@mui/material";
 import NewAuthenticatedLayout from "@/Layouts/NewAuthenticatedLayout.jsx";
-import {Box, Button, Grid, Paper, Tab, Tabs, TextField, Typography} from "@mui/material";
-import * as PropTypes from "prop-types";
-import {lazy, useEffect, useState, Suspense} from "react";
-import Profile from "@/Pages/Admin/Employee/Partials/Profile.jsx";
+import WorkingHours from "@/Pages/Admin/Employee/Partials/WorkingHours.jsx";
 
-const formData = {
-    name: "",
-    lastName: "",
-    email: "",
-    username: "",
-    password: null,
-    phoneNumber: "",
-    timeZone: "",
-}
-
-function TabPanel(props) {
-    return null;
-}
-
-TabPanel.propTypes = {
-    index: PropTypes.number,
-    children: PropTypes.node
-};
-export default function Index({ auth, timeIntervals, workingHours, employee = null }) {
+export default function Profile({ auth, timeIntervals, workingHours }) {
     const { errors } = usePage().props
 
     const EmployeeProfile = lazy(() => import('@/Pages/Admin/Employee/Partials/Profile.jsx'));
@@ -67,22 +44,22 @@ export default function Index({ auth, timeIntervals, workingHours, employee = nu
     return (
         <NewAuthenticatedLayout
             user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Employees</h2>}
+            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Details</h2>}
         >
-            <Head title="Employeess" />
+            <Head title="Profile" />
 
             <Paper elevation={3} sx={{ padding: 2, borderRadius: 2 }}>
                 <Box sx={{ width: '100%' }}>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChangeTabs} aria-label="basic tabs example">
-                            <Tab label="Profile" component={Link} href={route('admin.employee.create')} {...a11yProps(0)} />
+                            <Tab label="Profile" component={Link} href={route('employee.profile', )} {...a11yProps(0)} />
                             <Tab label="Working hours" {...a11yProps(1)} />
                             <Tab label="Special dates" {...a11yProps(2)} />
                         </Tabs>
                     </Box>
                     <Suspense fallback={<div>Loading...</div>}>
                         <TabPanel value={value} index={0}>
-                            <EmployeeProfile auth={auth} employee={employee}/>
+                            <EmployeeProfile auth={auth} employee={auth.user}/>
                         </TabPanel>
                     </Suspense>
                     <Suspense fallback={<div>Loading...</div>}>
@@ -90,11 +67,12 @@ export default function Index({ auth, timeIntervals, workingHours, employee = nu
                             <WorkingHours
                                 intervals={timeIntervals}
                                 workingHours={workingHours}
+                                user={auth.user}
                             />
                         </TabPanel>
                     </Suspense>
                     <TabPanel value={value} index={2}>
-                        <WorkingHours/>
+                        Special Dates
                     </TabPanel>
                 </Box>
             </Paper>

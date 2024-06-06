@@ -1,33 +1,10 @@
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.jsx";
-import {Head, Link, useForm, usePage} from "@inertiajs/react";
-import WorkingHours from "@/Pages/Admin/Employee/Partials/WorkingHours.jsx";
-import PrimaryButton from "@/Components/PrimaryButton.jsx";
-import TextInput from "@/Components/TextInput.jsx";
+import {Head, Link, usePage} from "@inertiajs/react";
+import {lazy, Suspense, useState} from "react";
+import {Box, Paper, Tab, Tabs} from "@mui/material";
 import NewAuthenticatedLayout from "@/Layouts/NewAuthenticatedLayout.jsx";
-import {Box, Button, Grid, Paper, Tab, Tabs, TextField, Typography} from "@mui/material";
-import * as PropTypes from "prop-types";
-import {lazy, useEffect, useState, Suspense} from "react";
-import Profile from "@/Pages/Admin/Employee/Partials/Profile.jsx";
+import WorkingHours from "@/Pages/Admin/Employee/Partials/WorkingHours.jsx";
 
-const formData = {
-    name: "",
-    lastName: "",
-    email: "",
-    username: "",
-    password: null,
-    phoneNumber: "",
-    timeZone: "",
-}
-
-function TabPanel(props) {
-    return null;
-}
-
-TabPanel.propTypes = {
-    index: PropTypes.number,
-    children: PropTypes.node
-};
-export default function Index({ auth, timeIntervals, workingHours, employee = null }) {
+export default function Edit({ auth, timeIntervals, workingHours, employee }) {
     const { errors } = usePage().props
 
     const EmployeeProfile = lazy(() => import('@/Pages/Admin/Employee/Partials/Profile.jsx'));
@@ -75,7 +52,7 @@ export default function Index({ auth, timeIntervals, workingHours, employee = nu
                 <Box sx={{ width: '100%' }}>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChangeTabs} aria-label="basic tabs example">
-                            <Tab label="Profile" component={Link} href={route('admin.employee.create')} {...a11yProps(0)} />
+                            <Tab label="Profile" component={Link} href={route('admin.employee.edit', {employee: employee.id})} {...a11yProps(0)} />
                             <Tab label="Working hours" {...a11yProps(1)} />
                             <Tab label="Special dates" {...a11yProps(2)} />
                         </Tabs>
@@ -90,6 +67,7 @@ export default function Index({ auth, timeIntervals, workingHours, employee = nu
                             <WorkingHours
                                 intervals={timeIntervals}
                                 workingHours={workingHours}
+                                user={employee}
                             />
                         </TabPanel>
                     </Suspense>

@@ -29,7 +29,8 @@ class WorkingHoursController extends Controller
             $newDay->save();
         }
 
-        return redirect(route('admin.employee.edit', $id));
+        return redirect()->back()->with('success', 'Working hours updated successfully.');
+        //return redirect(route('admin.employee.edit', $id));
     }
 
     public function setEveryDay(int $id, Request $request)
@@ -63,6 +64,7 @@ class WorkingHoursController extends Controller
             }
         }
 
-        return redirect(route('admin.employee.edit', $id));
+        return redirect()->back()->with('success', 'Working hours updated successfully.');
+        // return redirect(route('admin.employee.edit', $id));
     }
 }

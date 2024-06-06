@@ -1,30 +1,25 @@
-import {useForm} from "@inertiajs/react";
 import WorkingHoursForm from "@/Pages/Admin/Employee/Partials/WorkingHoursForm.jsx";
 import {useEffect, useState} from "react";
+import {Box, Container} from "@mui/material";
 
-export default function WorkingHours({ intervals, workingHours }) {
+export default function WorkingHours({ intervals, workingHours, user }) {
 
     const [workingHoursData, setWorkingHoursData] = useState([]);
 
     useEffect(() => {
-        console.log('se actualiza ', workingHours)
         setWorkingHoursData(workingHours)
     }, [workingHours]);
 
     return (
-        <section className='max-w-xl'>
-
-            <div className="mt-6 space-y-6">
-                <h1>Working Hours</h1>
-
-                {workingHoursData && workingHoursData.map((workingHour) => (
-                    <WorkingHoursForm
-                        key={workingHour.key}
-                        intervals={intervals}
-                        workingHour={workingHour}/>
-                ))}
-            </div>
-
-        </section>
+        <>
+            {workingHoursData && workingHoursData.map((workingHour) => (
+                <WorkingHoursForm
+                    key={workingHour.key}
+                    intervals={intervals}
+                    workingHour={workingHour}
+                    user={user}
+                />
+            ))}
+        </>
     );
 }

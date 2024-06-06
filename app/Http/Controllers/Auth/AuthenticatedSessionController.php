@@ -40,7 +40,7 @@ class AuthenticatedSessionController extends Controller
         }
 
         if (Auth::getUser()->hasRole('employee')) {
-            return redirect()->intended(route('employee.dashboard', absolute: false));
+            return redirect()->intended(route('employee.appointments', absolute: false));
         }
 
         return redirect('/');

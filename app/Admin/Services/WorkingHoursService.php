@@ -3,11 +3,12 @@
 namespace App\Admin\Services;
 
 use App\Admin\Models\WorkingHour;
+use App\Models\User;
 use Illuminate\Support\Collection;
 
 class WorkingHoursService
 {
-    public function getWorkingHoursData(): Collection
+    public function getWorkingHoursData(User $user = null): Collection
     {
         // Define all days of the week with default values
         $daysOfWeek = [
@@ -20,8 +21,10 @@ class WorkingHoursService
             ['key' => 6, 'value' => 'Saturday', 'start_time' => null, 'end_time' => null],
         ];
 
-        // Fetch data from the database
-        $workingHours = WorkingHour::all();
+        $workingHours = collect([]);
+        if ($user) {
+            $workingHours = WorkingHour::where('user_id', $user->id)->get();
+        }
 
         // Map the fetched data to the default days of the week
         foreach ($workingHours as $workingHour) {

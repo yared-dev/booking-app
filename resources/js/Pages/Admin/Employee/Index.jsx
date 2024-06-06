@@ -1,10 +1,12 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.jsx";
 import {Head, Link} from "@inertiajs/react";
-import {Button} from "@mui/material";
+import NewAuthenticatedLayout from "@/Layouts/NewAuthenticatedLayout.jsx";
+import {Box, Button, Paper, Typography} from "@mui/material";
+import React from "react";
 
 export default function Index({ auth, employees }) {
     return (
-        <AuthenticatedLayout
+        <NewAuthenticatedLayout
             user={auth.user}
             header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Employees</h2>}
         >
@@ -24,6 +26,15 @@ export default function Index({ auth, employees }) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+
+            <Paper elevation={3} sx={{ padding: 2, borderRadius: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button type="submit" variant="contained" color="primary">
+                        Create
+                    </Button>
+                </Box>
+
+            </Paper>
+        </NewAuthenticatedLayout>
     );
 }

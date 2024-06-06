@@ -2,11 +2,10 @@ import {useForm, usePage} from "@inertiajs/react";
 import PrimaryButton from "@/Components/PrimaryButton.jsx";
 import SecondaryButton from "@/Components/SecondaryButton.jsx";
 import {useEffect, useState} from "react";
+import {Grid, IconButton, MenuItem, Select} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 
-export default function WorkingHoursForm({ intervals, workingHour }) {
-    const { props } = usePage();
-    const { employee } = props;
-
+export default function WorkingHoursForm({ intervals, workingHour, user }) {
     const [workingHourData, setWorkingHourData] = useState({});
 
     useEffect(() => {
@@ -43,9 +42,9 @@ export default function WorkingHoursForm({ intervals, workingHour }) {
 
     const handleIntervalSelection = (e) => {
         e.preventDefault();
-        console.log({...data, employee_id: employee.id})
+        console.log({...data, employee_id: user.id})
 
-        post(`/admin/user/${employee.id}/working-hours`,
+        post(route('admin.working-hours.store', {id: user.id}),
             {
                 preserveState: true,
                 preserveScroll: true,
@@ -61,7 +60,7 @@ export default function WorkingHoursForm({ intervals, workingHour }) {
     };
 
     const applyEveryDay = () => {
-        post(`/admin/user/${employee.id}/working-hours/apply-every-day`,
+        post(route('admin.working-hours.every-day', {id: user.id}),
             {
                 preserveState: true,
                 preserveScroll: true,
@@ -77,28 +76,55 @@ export default function WorkingHoursForm({ intervals, workingHour }) {
     }
 
     return (
-        <form onSubmit={handleIntervalSelection}>
-            <p>{workingHourData.value}</p>
+        <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12}>
+                <p>{workingHourData.value}</p>
+            </Grid>
 
-            <select value={data.start} onChange={e => setData('start', e.target.value)}>
-                {intervals.map((interval) => (
-                    <option key={`start-${interval}`} value={interval}>
-                        {interval}
-                    </option>
-                ))}
-            </select>
+            <Grid item xs={12}>
+                <form onSubmit={handleIntervalSelection}>
+                    <Grid container spacing={2} alignItems="center">
+                        <Grid item>
+                            <Select
+                                value={data.start}
+                                onChange={e => setData('start', e.target.value)}
+                                displayEmpty
+                            >
+                                {intervals.map((interval) => (
+                                    <MenuItem key={`start-${interval}`} value={interval}>
+                                        {interval}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </Grid>
+                        <Grid item>
+                            <Select
+                                value={data.end}
+                                onChange={e => setData('end', e.target.value)}
+                                displayEmpty
+                            >
+                                {intervals.map((interval) => (
+                                    <MenuItem key={`end-${interval}`} value={interval}>
+                                        {interval}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </Grid>
 
-            <select value={data.end} onChange={e => setData('end', e.target.value)}>
-                {intervals.map((interval) => (
-                    <option key={`end-${interval}`} value={interval}>
-                        {interval}
-                    </option>
-                ))}
-            </select>
+                        <Grid item>
+                            {workingHourData.key === 1 && (<SecondaryButton onClick={applyEveryDay}>apply to every day</SecondaryButton>)}
+                        </Grid>
 
-            {workingHourData.key === 1 && (<SecondaryButton onClick={applyEveryDay}>apply to every day</SecondaryButton>)}
+                        <Grid item>
+                            <PrimaryButton type={'submit'}>Save</PrimaryButton>
+                        </Grid>
 
-            <PrimaryButton type={'submit'}>Save</PrimaryButton>
-        </form>
+                        <Grid item>
+                            <IconButton onClick={() => null}><DeleteIcon /></IconButton>
+                        </Grid>
+                    </Grid>
+                </form>
+            </Grid>
+        </Grid>
     );
 }

@@ -10,6 +10,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 
@@ -62,13 +64,14 @@ class EmployeeController extends Controller
 
         $employeeRole = Role::firstOrCreate(['name' => 'employee']);
 
+        $user = null;
         try {
-            DB::transaction(function () use ($request, $employeeRole) {
+            DB::transaction(function () use ($request, $employeeRole, &$user) {
                 $user = User::create([
                     'name' => $request->name,
                     'last_name' => $request->last_name,
                     'email' => $request->email,
-                    'password' => bcrypt($request->password),
+                    'password' => Hash::make($request->password),
                 ]);
 
                 $user->assignRole($employeeRole);
@@ -86,18 +89,62 @@ class EmployeeController extends Controller
             );
         }
 
-
-
-        return redirect()->route('admin.employee.index');
+        return redirect()->route('admin.employee.edit', ['employee' => $user->id])->with('success', 'Employee created successfully.');
     }
 
     public function edit(int $id)
     {
-        //dd($employee);
-        return Inertia::render('Admin/Employee/Create', [
+        $user = Auth::user();
+
+        if (!$user->hasRole('admin') && ($user->hasRole('employee') && $user->id !== $id)) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $employeeUser = $user;
+        if ($user->hasRole('admin')) {
+            $employee = $user->employee()->where('id', $id)->firstOrFail();
+            $employeeUser = User::findOrFail($employee->id);
+        }
+
+        return Inertia::render('Admin/Employee/Edit', [
             'employee' => $this->employeeRepository->findEmployee($id),
             'timeIntervals' => getTimeIntervals(),
-            'workingHours' => $this->workingHoursService->getWorkingHoursData(),
+            'workingHours' => $this->workingHoursService->getWorkingHoursData($employeeUser),
         ]);
+    }
+
+    public function update(Request $request, string $id)
+    {
+        $user = Auth::user();
+
+        if (!$user->hasRole('admin') && ($user->hasRole('employee') && $user->id !== (int)$id)) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $request->validate([
+            'name' => ['required', 'max:100'],
+            'last' => ['max:100'],
+            'password' => ['nullable', Password::defaults()],
+        ]);
+
+        if ($user->hasRole('admin')) {
+            $employee = $user->employee()->where('id', $id)->firstOrFail();
+        } else {
+            $employee = Employee::findOrFail($id);
+        }
+
+        $employeeUser = User::findOrFail($employee->id);
+
+        $employeeUser->name = $request->name;
+        $employeeUser->last_name = $request->last_name;
+        $employeeUser->email = $request->email;
+
+        if ($request->filled('password')) {
+            $employeeUser->password = bcrypt($request->password);
+        }
+
+        $employeeUser->save();
+
+        return redirect()->back()->with('success', 'Employee details updated successfully.');
     }
 }
