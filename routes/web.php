@@ -4,6 +4,7 @@ use App\Admin\Controllers\CategoryController;
 use App\Admin\Controllers\EmployeeController;
 use App\Admin\Controllers\ServiceController;
 use App\Admin\Controllers\WorkingHoursController;
+use App\Booking\Controllers\BookingController;
 use App\Employee\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Foundation\Application;
@@ -26,6 +27,9 @@ Route::get('/', function () {
 /*Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');*/
+
+Route::get("booking/{key}", [BookingController::class, 'index'])->name('booking.index');
+Route::post("booking/available-slots", [BookingController::class, 'availableSlots'])->name('booking.available-slots');
 
 Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
