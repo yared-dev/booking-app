@@ -1,14 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { startOfMonth, endOfMonth, eachDayOfInterval, format, addMonths, subMonths, setMonth, setYear } from 'date-fns';
-import { Container, Grid, MenuItem, Select, IconButton, Typography, Button } from '@mui/material';
+import {Container, Grid, MenuItem, Select, IconButton, Typography, Button, Box, CssBaseline} from '@mui/material';
 import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
 import {startOfWeek} from "date-fns/startOfWeek";
 import {endOfWeek} from "date-fns/endOfWeek";
+import {parseISO} from "date-fns/parseISO";
+import {set} from "date-fns/set";
+import {router} from "@inertiajs/react";
 
-const Calendar = ({ onDayClick }) => {
+const Calendar = ({ timeSlots, dateTime, onDateTimeChange }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [days, setDays] = useState([]);
     const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    const [selectedDate, setSelectedDate] = useState(null);
+    const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
+    const [bookingDateTime, setBookingDateTime] = useState(null);
+
+    const resetSelection = () => {
+        setSelectedDate(null);
+        setSelectedTimeSlot(null);
+        setBookingDateTime(null);
+    }
+
+
 
     useEffect(() => {
         const start = startOfMonth(currentDate);
@@ -24,17 +39,25 @@ const Calendar = ({ onDayClick }) => {
     }, [currentDate]);
 
     const handleMonthChange = (e) => {
+        resetSelection();
         const newDate = setMonth(currentDate, e.target.value);
         setCurrentDate(newDate);
     };
 
     const handleYearChange = (e) => {
+        resetSelection();
         const newDate = setYear(currentDate, e.target.value);
         setCurrentDate(newDate);
     };
 
-    const handlePrevMonth = () => setCurrentDate(subMonths(currentDate, 1));
-    const handleNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
+    const handlePrevMonth = () => {
+        resetSelection();
+        setCurrentDate(subMonths(currentDate, 1));
+    }
+    const handleNextMonth = () => {
+        resetSelection();
+        setCurrentDate(addMonths(currentDate, 1));
+    }
 
     const getWeeks = () => {
         const weeks = [];
@@ -55,16 +78,70 @@ const Calendar = ({ onDayClick }) => {
         return weeks;
     };
 
+
+
+    const formatDayString = () => {
+        if (!selectedDate) {
+            return;
+        }
+
+        let date = parseISO(selectedDate.toISOString());
+
+        // Extract hours, minutes, and seconds from the time string
+        const [hours, minutes, seconds] = selectedTimeSlot ? selectedTimeSlot.split(':') : timeSlots['1_hour_intervals'][1].split(':');
+
+        // Set the hours, minutes, and seconds to the parsed date
+        const parsedDate = set(date, { hours, minutes, seconds });
+
+        // Format the date components
+        const formatDateTime = format(date, 'MMMM dd, yyyy') + ' - ' + format(parsedDate, 'h:mm a');
+        setBookingDateTime(formatDateTime);
+    }
+
+    useEffect(() => {
+
+            formatDayString()
+            //onDateTimeChange({ selectedDate, selectedTimeSlot: selectedTimeSlot, bookingDateTime: bookingDateTime });
+
+    }, [selectedTimeSlot]);
+
+    useEffect(() => {
+        onDateTimeChange({ selectedDate, selectedTimeSlot: selectedTimeSlot, bookingDateTime: bookingDateTime });
+    }, [bookingDateTime]);
+
+    const handleSelectTimeSlot = (index) => {
+        console.log(index);
+        setSelectedTimeSlot(index);
+    }
+
+    const handleFetchDaySlots = (day) => {
+        console.log(day);
+        setSelectedTimeSlot(null);
+        setBookingDateTime(null);
+        router.post(route('booking.available-slots'), {
+                day: day,
+                employee: 3
+            },
+            {
+                onSuccess: (response) => {
+                    console.log(response);
+                    setSelectedDate(day);
+                    setSelectedTimeSlot(response.props.timeSlots['1_hour_intervals'][0]);
+                    formatDayString()
+                },
+                onError: (error) => {
+                    console.log(error);
+                }
+            }
+        );
+    }
+
     return (
-        <Container>
+        <Box width={'100%'}>
+            <CssBaseline />
             <Grid container spacing={2} alignItems="center">
-                <Grid item>
-                    <IconButton onClick={handlePrevMonth}>
-                        <ArrowBackIos />
-                    </IconButton>
-                </Grid>
-                <Grid item>
-                    <Select value={currentDate.getMonth()} onChange={handleMonthChange}>
+                <Grid item xs={12} sm={5}>
+                    <Select fullWidth value={currentDate.getMonth()} onChange={handleMonthChange}>
                         {Array.from({ length: 12 }).map((_, i) => (
                             <MenuItem key={i} value={i}>
                                 {format(new Date(currentDate.getFullYear(), i), 'MMMM')}
@@ -72,8 +149,8 @@ const Calendar = ({ onDayClick }) => {
                         ))}
                     </Select>
                 </Grid>
-                <Grid item>
-                    <Select value={currentDate.getFullYear()} onChange={handleYearChange}>
+                <Grid item xs={12} sm={5}>
+                    <Select fullWidth value={currentDate.getFullYear()} onChange={handleYearChange}>
                         {Array.from({ length: 10 }, (_, i) => (
                             <MenuItem key={i} value={currentDate.getFullYear() - 5 + i}>
                                 {currentDate.getFullYear() - 5 + i}
@@ -81,33 +158,44 @@ const Calendar = ({ onDayClick }) => {
                         ))}
                     </Select>
                 </Grid>
-                <Grid item>
+                <Grid item xs={6} sm={1}>
+                    <IconButton onClick={handlePrevMonth}>
+                        <ArrowBackIos />
+                    </IconButton>
+                </Grid>
+                <Grid item xs={6} sm={1}>
                     <IconButton onClick={handleNextMonth}>
                         <ArrowForwardIos />
                     </IconButton>
                 </Grid>
             </Grid>
-            <Grid container spacing={1} justifyContent="center" sx={{ marginTop: 2 }}>
+            <Grid container spacing={1} justifyContent="space-evenly" py={2}>
                 {daysOfWeek.map((day) => (
-                    <Grid item xs={1} key={day} sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+                    <Grid item xs={1} key={day} sx={{padding: 1, textAlign: 'center', fontWeight: 'bold' }}>
                         {day}
                     </Grid>
                 ))}
             </Grid>
             {getWeeks().map((week, weekIndex) => (
-                <Grid container spacing={1} justifyContent="center" key={weekIndex}>
+                <Grid container spacing={1} justifyContent="space-evenly" key={weekIndex} py={1}>
                     {week.map((day, dayIndex) => (
                         <Grid
                             item
                             key={dayIndex}
                             xs={1}
-                            onClick={() => onDayClick(day)}
+                            onClick={() => handleFetchDaySlots(day)}
                             sx={{
-                                padding: 2,
+                                padding: 1,
                                 border: '1px solid #ccc',
+                                borderRadius: '4px',
                                 textAlign: 'center',
                                 cursor: 'pointer',
                                 backgroundColor: currentDate.getMonth() === day.getMonth() ? 'white' : '#f0f0f0',
+                                '&:hover': {
+                                    backgroundColor:
+                                        currentDate.getMonth() === day.getMonth() ? '#e0e0e0' : '#f0f0f0', // Different hover colors
+                                    borderColor: '#999',
+                                },
                             }}
                         >
                             {format(day, 'd')}
@@ -115,7 +203,32 @@ const Calendar = ({ onDayClick }) => {
                     ))}
                 </Grid>
             ))}
-        </Container>
+            {selectedDate && (
+                <>
+                    <Typography variant="h6" gutterBottom>{bookingDateTime}</Typography>
+                    <Grid container spacing={0} justifyContent="space-evenly" sx={{ marginTop: 2 }}>
+                        {timeSlots && timeSlots['1_hour_intervals'].map((value, index) => (
+                            <Grid key={index}
+                                  sx={{
+                                      padding: '2px 0',
+                                      margin: 1,
+                                      border: '1px solid #ccc',
+                                      borderRadius: '4px',
+                                      textAlign: 'center',
+                                      cursor: 'pointer',
+                                      '&:hover': {
+                                          backgroundColor: '#f0f0f0', // Change to the desired hover background color
+                                          borderColor: '#999', // Change to the desired hover border color
+                                      },
+                                  }}
+                                  item xs={12} sm={5} onClick={() => handleSelectTimeSlot(value)}>
+                                {value}
+                            </Grid>
+                        ))}
+                    </Grid>
+                </>
+            )}
+        </Box>
     );
 };
 
