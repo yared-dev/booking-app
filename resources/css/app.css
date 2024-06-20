@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@media (max-width: 844px) {
+    /* … */
+    .hideSideBar{
+        display: none;
+    }
+    .showAllBar{
+        width: 100% !important;
+    }
+}
+  

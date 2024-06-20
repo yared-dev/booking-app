@@ -90,7 +90,7 @@ export default function Index({ timeSlots }) {
             </Typography>
             <Container maxWidth="md">
                 <Stack direction='row' spacing={0} justifyContent={'space-between'} backgroundColor='#ffffff'>
-                    <Box width={'30%'} backgroundColor='#6a1b9a'  color='white' p={3}>
+                    <Box width={'30%'} backgroundColor='#6a1b9a'  color='white' p={3} className="hideSideBar" >
                         <Box p={'4px'} bgcolor={'rgba(255, 255, 255, 0.05)'} borderRadius={'4px'} marginBottom={'8px'}>
                             <Stack direction='row' spacing={1} alignItems={'center'} marginBottom={'2px'}>
                                 <PunchClockOutlinedIcon width={'0.8em'}/>
@@ -121,7 +121,7 @@ export default function Index({ timeSlots }) {
                             </Stack>
                         </Box>
                     </Box>
-                    <Box width={'70%'} sx={{ display: 'flex', flexDirection: 'column', maxHeight:'800px' }}>
+                    <Box width={'70%'} sx={{ display: 'flex', flexDirection: 'column', maxHeight:'800px' }} className="showAllBar" >
                         <Box component="header" sx={{ py: 2, px: 2, boxShadow:'0 2px 3px rgba(26, 44, 55, 0.15)', textAlign: 'left' }}>
                             <Typography variant="h5">
                                 {steps.description}

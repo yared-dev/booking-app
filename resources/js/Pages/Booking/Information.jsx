@@ -2,11 +2,13 @@ import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import { useForm } from "@inertiajs/react";
-import { Box, CssBaseline, Grid } from "@mui/material";
+import { Box, CssBaseline, Grid, createTheme, useMediaQuery } from "@mui/material";
 import { useEffect } from "react";
 import UnstyledSelectRichOptions from "./SelectedCountry";
 
 const Information = ({ timeSlots, dateTime, onDateTimeChange }) => {
+    const theme = createTheme();
+
     const { data, setData, post, processing, errors, reset } = useForm({
         firstName: "",
         lastName: "",
@@ -23,12 +25,14 @@ const Information = ({ timeSlots, dateTime, onDateTimeChange }) => {
 
         post(route("login"));
     };
+    const isLargeScreen = useMediaQuery(theme.breakpoints.up("sm"));
+
     return (
         <Box width={"100%"}>
             <CssBaseline />
             <form>
-                <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={6}>
+                <Grid container spacing={2} alignItems="center" direction={isLargeScreen ? "row" : "column"}>
+                    <Grid item xs={12} sm={12} md={6} lg={6}>
                         {/* <AcUnitIcon sx={{ fontSize: 10 }}></AcUnitIcon> */}
                         <InputLabel htmlFor="firstName" value="First Name:" />
                         <TextInput
@@ -48,7 +52,7 @@ const Information = ({ timeSlots, dateTime, onDateTimeChange }) => {
                             className="mt-2"
                         />
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12} sm={12} md={6} lg={6}>
                         <InputLabel htmlFor="lastName" value="Last Name:" />
                         <TextInput
                             id="lastName"
@@ -68,8 +72,8 @@ const Information = ({ timeSlots, dateTime, onDateTimeChange }) => {
                         />
                     </Grid>
                 </Grid>
-                <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={6}>
+                <Grid container spacing={2} alignItems="center" direction={isLargeScreen ? "row" : "column"}>
+                    <Grid item xs={12} sm={12} md={6} lg={6}>
                         {/* <AcUnitIcon sx={{ fontSize: 10 }}></AcUnitIcon> */}
                         <InputLabel htmlFor="email" value="Email:" />
                         <TextInput
@@ -84,7 +88,7 @@ const Information = ({ timeSlots, dateTime, onDateTimeChange }) => {
                         />
                         <InputError message={errors.email} className="mt-2" />
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12} sm={12} md={6} lg={6}>
                         <div style={{ display: "flex" }}>
                                 <UnstyledSelectRichOptions></UnstyledSelectRichOptions>
                                 <InputLabel htmlFor="phone" value="Phone:" />
@@ -107,20 +111,20 @@ const Information = ({ timeSlots, dateTime, onDateTimeChange }) => {
                         </div>
                     </Grid>
                 </Grid>
-                <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={6}>
+                <Grid container spacing={2} alignItems="center" direction={isLargeScreen ? "row" : "column"}>
+                    <Grid item xs={12} sm={12} md={6} lg={6}>
                         {/* <AcUnitIcon sx={{ fontSize: 10 }}></AcUnitIcon> */}
-                        <InputLabel htmlFor="firstName" value="First Name:" />
+                        <InputLabel htmlFor="City" value="City:" />
                         <TextInput
-                            id="firstName"
+                            id="City"
                             type="text"
-                            name="firstName"
-                            value={data.firstName}
+                            name="City"
+                            value={data.City}
                             className="mt-1 block w-full"
                             autoComplete="username"
                             isFocused={true}
                             onChange={(e) =>
-                                setData("firstName", e.target.value)
+                                setData("City", e.target.value)
                             }
                         />
                         <InputError
@@ -128,7 +132,48 @@ const Information = ({ timeSlots, dateTime, onDateTimeChange }) => {
                             className="mt-2"
                         />
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12} sm={12} md={6} lg={6}>
+                        <InputLabel htmlFor="fechaNacimiento" value="Date Of Birth:" />
+                        <TextInput
+                            id="fechaNacimiento"
+                            type="date"
+                            name="fechaNacimiento"
+                            value={data.fechaNacimiento}
+                            className="mt-1 block w-full"
+                            autoComplete="username"
+                            isFocused={true}
+                            onChange={(e) =>
+                                setData("fechaNacimiento", e.target.value)
+                            }
+                        />
+                        <InputError
+                            message={errors.lastName}
+                            className="mt-2"
+                        />
+                    </Grid>
+                </Grid>
+                <Grid container spacing={2} alignItems="center" direction={isLargeScreen ? "row" : "column"}>
+                    <Grid item xs={12} sm={12} md={6} lg={6}>
+                        {/* <AcUnitIcon sx={{ fontSize: 10 }}></AcUnitIcon> */}
+                        <InputLabel htmlFor="Gender" value="Gender:" />
+                        <TextInput
+                            id="Gender"
+                            type="text"
+                            name="Gender"
+                            value={data.Gender}
+                            className="mt-1 block w-full"
+                            autoComplete="username"
+                            isFocused={true}
+                            onChange={(e) =>
+                                setData("Gender", e.target.value)
+                            }
+                        />
+                        <InputError
+                            message={errors.Gender}
+                            className="mt-2"
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={6} lg={6}>
                         <InputLabel htmlFor="lastName" value="Last Name:" />
                         <TextInput
                             id="lastName"
@@ -148,8 +193,8 @@ const Information = ({ timeSlots, dateTime, onDateTimeChange }) => {
                         />
                     </Grid>
                 </Grid>
-                <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={6}>
+                <Grid container spacing={2} alignItems="center" direction={isLargeScreen ? "row" : "column"}>
+                    <Grid item xs={12} sm={12} md={6} lg={6}>
                         {/* <AcUnitIcon sx={{ fontSize: 10 }}></AcUnitIcon> */}
                         <InputLabel htmlFor="firstName" value="First Name:" />
                         <TextInput
@@ -169,7 +214,7 @@ const Information = ({ timeSlots, dateTime, onDateTimeChange }) => {
                             className="mt-2"
                         />
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12} sm={12} md={6} lg={6}>
                         <InputLabel htmlFor="lastName" value="Last Name:" />
                         <TextInput
                             id="lastName"
@@ -189,8 +234,8 @@ const Information = ({ timeSlots, dateTime, onDateTimeChange }) => {
                         />
                     </Grid>
                 </Grid>
-                <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={6}>
+                <Grid container spacing={2} alignItems="center" direction={isLargeScreen ? "row" : "column"}>
+                    <Grid item xs={12} sm={12} md={6} lg={6}>
                         {/* <AcUnitIcon sx={{ fontSize: 10 }}></AcUnitIcon> */}
                         <InputLabel htmlFor="firstName" value="First Name:" />
                         <TextInput
@@ -210,7 +255,7 @@ const Information = ({ timeSlots, dateTime, onDateTimeChange }) => {
                             className="mt-2"
                         />
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12} sm={12} md={6} lg={6}>
                         <InputLabel htmlFor="lastName" value="Last Name:" />
                         <TextInput
                             id="lastName"
@@ -230,8 +275,8 @@ const Information = ({ timeSlots, dateTime, onDateTimeChange }) => {
                         />
                     </Grid>
                 </Grid>
-                <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={6}>
+                <Grid container spacing={2} alignItems="center" direction={isLargeScreen ? "row" : "column"}>
+                    <Grid item xs={12} sm={12} md={6} lg={6}>
                         {/* <AcUnitIcon sx={{ fontSize: 10 }}></AcUnitIcon> */}
                         <InputLabel htmlFor="firstName" value="First Name:" />
                         <TextInput
@@ -251,48 +296,7 @@ const Information = ({ timeSlots, dateTime, onDateTimeChange }) => {
                             className="mt-2"
                         />
                     </Grid>
-                    <Grid item xs={6}>
-                        <InputLabel htmlFor="lastName" value="Last Name:" />
-                        <TextInput
-                            id="lastName"
-                            type="text"
-                            name="lastName"
-                            value={data.lastName}
-                            className="mt-1 block w-full"
-                            autoComplete="username"
-                            isFocused={true}
-                            onChange={(e) =>
-                                setData("lastName", e.target.value)
-                            }
-                        />
-                        <InputError
-                            message={errors.lastName}
-                            className="mt-2"
-                        />
-                    </Grid>
-                </Grid>
-                <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={6}>
-                        {/* <AcUnitIcon sx={{ fontSize: 10 }}></AcUnitIcon> */}
-                        <InputLabel htmlFor="firstName" value="First Name:" />
-                        <TextInput
-                            id="firstName"
-                            type="text"
-                            name="firstName"
-                            value={data.firstName}
-                            className="mt-1 block w-full"
-                            autoComplete="username"
-                            isFocused={true}
-                            onChange={(e) =>
-                                setData("firstName", e.target.value)
-                            }
-                        />
-                        <InputError
-                            message={errors.firstName}
-                            className="mt-2"
-                        />
-                    </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12} sm={12} md={6} lg={6}>
                         <InputLabel htmlFor="lastName" value="Last Name:" />
                         <TextInput
                             id="lastName"
