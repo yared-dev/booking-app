@@ -81,14 +81,17 @@ export default function Index({ timeSlots }) {
         }
         setSteps(STEPS[position])
     };
-    
+
+    const submitInformation = (e) => {
+        console.log("🚀 ~ submitInformation ~ e:", e)
+    };
     return (
         <Layout>
             {/* Your main content goes here */}
             <Typography variant="h4" component="h1" gutterBottom sx={{ textAlign: 'center' }}>
                 A Private Healing Session with Abhijith
             </Typography>
-            <Container maxWidth="md">
+            <Container maxWidth="lg">
                 <Stack direction='row' spacing={0} justifyContent={'space-between'} backgroundColor='#ffffff'>
                     <Box width={'30%'} backgroundColor='#6a1b9a'  color='white' p={3} className="hideSideBar" >
                         <Box p={'4px'} bgcolor={'rgba(255, 255, 255, 0.05)'} borderRadius={'4px'} marginBottom={'8px'}>
@@ -129,10 +132,12 @@ export default function Index({ timeSlots }) {
                         </Box>
                         <Box component="section" sx={{ overflowY: 'auto', p: 2 }}>
                             {steps.route == 'calendar' ? (<Calendar timeSlots={timeSlots} dateTime={dateTime} onDateTimeChange={handleDateTimeChange} />): null}
-                            {steps.route == 'information' ? (<Information timeSlots={timeSlots} dateTime={dateTime} onDateTimeChange={handleDateTimeChange} />): null}
+                            {steps.route == 'information' ? (<Information submitInformation={submitInformation} />): null}
                         </Box>
                         <Box component="footer" sx={{ py: 2, px: 2, boxShadow:'0 -2px 3px rgba(26, 44, 55, 0.15)', color: 'white', textAlign: 'right' }}>
-                            <Button variant="contained" color="primary" onClick={()=>handleNextStep()}>Continue</Button>
+                            {steps.route == 'calendar' ? (<Button variant="contained" color="primary" onClick={()=>handleNextStep()}>Continue</Button>): null}
+                            {steps.route == 'information' ? (<Button variant="contained" color="primary" onClick={()=>handleNextStep()}>Continue</Button>): null}
+                            {steps.route == 'BokkingCode' ? (<Button variant="contained" color="primary" onClick={()=>handleNextStep()}>Continue</Button>): null}
                         </Box>
                     </Box>
                 </Stack>
