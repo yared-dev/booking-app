@@ -1,0 +1,23 @@
+POST https://booking-app.test/api/login
+Accept: application/json
+Content-Type: application/json
+
+{
+    "email": "james@employee.com",
+    "password": "12345678"
+}
+
+###
+GET https://booking-app.test/api/user
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer 3|0KunqH5S57uHiAzEEXS4ff24j1louvgyM3OFABtu96a80eb4
+
+###
+GET https://booking-app.test/api/appointments/generate-magic-link?user=test@employee.com
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer 5|0McSVJTe0kBDKmiwL46tfCyjZdCRQHBLoM85anKMddef0866
+
+###
+

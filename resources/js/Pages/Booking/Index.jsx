@@ -57,7 +57,7 @@ const STEPS = [
         description: "BokkingCode"
     },
 ];
-export default function Index({ timeSlots }) {
+export default function Index({ timeSlots, user }) {
     const [dateTime, setDateTime] = useState({
         selectedDate: null,
         selectedTimeSlot: null,
@@ -89,7 +89,7 @@ export default function Index({ timeSlots }) {
         <Layout>
             {/* Your main content goes here */}
             <Typography variant="h4" component="h1" gutterBottom sx={{ textAlign: 'center' }}>
-                A Private Healing Session with Abhijith
+                A Private Healing Session with {user.name} {user.last_name}
             </Typography>
             <Container maxWidth="lg">
                 <Stack direction='row' spacing={0} justifyContent={'space-between'} backgroundColor='#ffffff'>

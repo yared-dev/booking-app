@@ -8,7 +8,7 @@ import {
     ListItemIcon,
     ListItemText,
     Toolbar, MenuItem,
-    Typography, Button, Stack, Container
+    Typography, Button, Stack, Container, Grid, Paper
 } from "@mui/material";
 import {AccountCircle} from "@mui/icons-material";
 import {useState} from "react";
@@ -267,20 +267,21 @@ function Sidebar({ user, header, children }) {
                     {drawer}
                 </Drawer>
             </Box>
-            <Box width={'100%'}>
+            <Box width={'100%'} justifyContent={'center'} p={2}>
                 <Toolbar />
-                <Stack direction="column" spacing={1}>
-                    <Container style={{ margin: '1em 0'}}>
-                        {header && (
-                            <Typography variant="h6" component="div" padding={'0 20px'} sx={{flexGrow: 1}}>
-                                {header}
-                            </Typography>
-                        )}
-                    </Container>
-                    <Container>
+                <Paper elevation={1}>
+                    <Grid item xs={12} md={12} p={2} bgcolor={'#f3f4f6'}>
+                        <Typography variant="h6" noWrap component="div">
+                            {header}
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={12} md={12} p={2}>
                         {children}
-                    </Container>
-                </Stack>
+                    </Grid>
+                </Paper>
+                <Grid container justifyContent='left' alignItems='center'>
+
+                </Grid>
             </Box>
         </Box>
     );

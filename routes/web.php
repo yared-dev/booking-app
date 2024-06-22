@@ -4,6 +4,7 @@ use App\Admin\Controllers\CategoryController;
 use App\Admin\Controllers\EmployeeController;
 use App\Admin\Controllers\ServiceController;
 use App\Admin\Controllers\WorkingHoursController;
+use App\Booking\Controllers\AppointmentController;
 use App\Booking\Controllers\BookingController;
 use App\Employee\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
@@ -28,7 +29,9 @@ Route::get('/', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');*/
 
-Route::get("booking/{key}", [BookingController::class, 'index'])->name('booking.index');
+Route::get('appointment/{code}/{encryptedUserId}', [AppointmentController::class, 'handleMagicLink'])->name('appointment.index');
+
+/*Route::get("booking/{key}", [BookingController::class, 'index'])->name('booking.index');*/
 Route::post("booking/available-slots", [BookingController::class, 'availableSlots'])->name('booking.available-slots');
 
 Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
@@ -46,15 +49,18 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 });
 
 Route::prefix('employee')->middleware(['auth', 'role:employee'])->group(function () {
-    Route::get('appointments', [AdminController::class, 'index'])->name('employee.appointments');
     Route::get('profile', [ProfileController::class, 'show'])->name('employee.profile');
 
     Route::put('edit', [ProfileController::class, 'update'])->name('employee.profile.update');
+
+    Route::get('appointments', [AppointmentController::class, 'index'])->name('user.appointments');
 });
 
 Route::middleware(['auth', 'role:admin|employee'])->group(function () {
     Route::post('user/{id}/working-hours', [WorkingHoursController::class, 'store'])->name('admin.working-hours.store');
     Route::post('user/{id}/working-hours/apply-every-day', [WorkingHoursController::class, 'setEveryDay'])->name('admin.working-hours.every-day');
+
+
 });
 
 /*Route::middleware('auth')->group(function () {

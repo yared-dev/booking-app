@@ -40,10 +40,22 @@ class AuthenticatedSessionController extends Controller
         }
 
         if (Auth::getUser()->hasRole('employee')) {
-            return redirect()->intended(route('employee.appointments', absolute: false));
+            return redirect()->intended(route('user.appointments', absolute: false));
         }
 
         return redirect('/');
+    }
+
+    public function apiLogin(LoginRequest $request)
+    {
+        $request->authenticate();
+
+        Auth::getUser()->tokens()->delete();
+
+        $token = Auth::getUser()->createToken('api-token',
+            ['api:read', 'employee:view'], now()->addDays(1));
+
+        return ['token' => $token->plainTextToken];
     }
 
     /**
