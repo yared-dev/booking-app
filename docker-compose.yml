@@ -1,0 +1,44 @@
+version: '3.8'
+ 
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8290:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./:/var/www/html
+    depends_on:
+      - php
+    networks:
+      - app-network
+ 
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - app-network
+ 
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3310:3306"
+    networks:
+      - app-network
+ 
+volumes:
+  mysql-data:
+ 
+networks:
+  app-network:
+    driver: bridge

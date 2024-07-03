@@ -1,6 +1,6 @@
-import {Head, Link, usePage} from "@inertiajs/react";
-import {lazy, Suspense, useState} from "react";
-import {Box, Paper, Tab, Tabs} from "@mui/material";
+import { Head, Link, usePage } from "@inertiajs/react";
+import { lazy, Suspense, useState } from "react";
+import { Box, Paper, Tab, Tabs, TextField, MenuItem, OutlinedInput } from "@mui/material";
 import NewAuthenticatedLayout from "@/Layouts/NewAuthenticatedLayout.jsx";
 import WorkingHours from "@/Pages/Admin/Employee/Partials/WorkingHours.jsx";
 import DaysOff from "@/Pages/Admin/Employee/Partials/DaysOff.jsx";
@@ -42,10 +42,47 @@ export default function Profile({ auth, timeIntervals, workingHours }) {
         );
     };
 
+    //CBO
+
+    const zones = [
+        'Asia/Kabul',
+        'Asia/Karachi'
+    ]
+
+    const [zone, setZone] = useState(zones[0]);
+    const handleChange = (event) => {
+        const {
+            target: { value },
+        } = event;
+        setZone(value);
+    };
+
     return (
         <NewAuthenticatedLayout
             user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Employee Profile</h2>}
+            header={<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h2 className="font-semibold text-xl text-gray-800 leading-tight">Employee Profile</h2>
+                
+                    <TextField
+                        size="small"
+                        select
+                        value={zone}
+                    onChange={handleChange}
+                    input={<OutlinedInput />}
+
+                    inputProps={{ 'aria-label': 'Without label' }}
+                    >
+                    {zones.map((zone) => (
+                        <MenuItem
+                            key={zone}
+                            value={zone}
+                        >
+                            {zone}
+                        </MenuItem>
+                    ))}
+                </TextField>
+            </Box>
+            }
         >
             <Head title="Profile" />
 
@@ -53,7 +90,7 @@ export default function Profile({ auth, timeIntervals, workingHours }) {
             <Box sx={{ width: '100%' }}>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <Tabs value={value} onChange={handleChangeTabs} aria-label="basic tabs example">
-                        <Tab label="Details" component={Link} href={route('employee.profile', )} {...a11yProps(0)} />
+                        <Tab label="Details" component={Link} href={route('employee.profile',)} {...a11yProps(0)} />
                         <Tab label="Working hours" {...a11yProps(1)} />
                         <Tab label="Days Off" {...a11yProps(2)} />
                         <Tab label="Special Days" {...a11yProps(3)} />
@@ -61,7 +98,7 @@ export default function Profile({ auth, timeIntervals, workingHours }) {
                 </Box>
                 <Suspense fallback={<div>Loading...</div>}>
                     <TabPanel value={value} index={0}>
-                        <EmployeeProfile auth={auth} employee={auth.user}/>
+                        <EmployeeProfile auth={auth} employee={auth.user} />
                     </TabPanel>
                 </Suspense>
                 <Suspense fallback={<div>Loading...</div>}>
