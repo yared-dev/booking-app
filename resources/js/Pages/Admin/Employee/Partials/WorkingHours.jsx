@@ -1,6 +1,6 @@
 import WorkingHoursForm from "@/Pages/Admin/Employee/Partials/WorkingHoursForm.jsx";
 import {useEffect, useState} from "react";
-import {Box, Container} from "@mui/material";
+import {Box, Container, Grid} from "@mui/material";
 
 export default function WorkingHours({ intervals, workingHours, user }) {
 
@@ -11,15 +11,20 @@ export default function WorkingHours({ intervals, workingHours, user }) {
     }, [workingHours]);
 
     return (
-        <>
-            {workingHoursData && workingHoursData.map((workingHour) => (
-                <WorkingHoursForm
+        
+        <Grid container spacing={2}>
+                {workingHoursData && workingHoursData.map((workingHour, index) => (
+                    <Grid item xs={12} sm={12} key={workingHour.key}>
+                        <WorkingHoursForm
                     key={workingHour.key}
                     intervals={intervals}
                     workingHour={workingHour}
                     user={user}
+                    allDays = {index===0}
                 />
+                    </Grid>
+                
             ))}
-        </>
+        </Grid>
     );
 }

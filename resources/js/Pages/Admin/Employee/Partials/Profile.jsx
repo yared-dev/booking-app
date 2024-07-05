@@ -165,7 +165,6 @@ export default function Profile({ auth, employee }) {
                                     style={{color:"white"}}
                                     label="Sing in with Outlook"
                                     name="btnOutlookCalendar"
-
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
