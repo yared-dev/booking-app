@@ -11,13 +11,13 @@ Content-Type: application/json
 GET https://booking-app.test/api/user
 Accept: application/json
 Content-Type: application/json
-Authorization: Bearer 3|0KunqH5S57uHiAzEEXS4ff24j1louvgyM3OFABtu96a80eb4
+Authorization: Bearer D7r2u6QqVa6bNwANZPUeNdkexgN39BWHf2fmJjVEe00cb05c
 
 ###
 GET https://booking-app.test/api/appointments/generate-magic-link?user=test@employee.com
 Accept: application/json
 Content-Type: application/json
-Authorization: Bearer 5|0McSVJTe0kBDKmiwL46tfCyjZdCRQHBLoM85anKMddef0866
+Authorization: Bearer D7r2u6QqVa6bNwANZPUeNdkexgN39BWHf2fmJjVEe00cb05c
 
 ###
 
