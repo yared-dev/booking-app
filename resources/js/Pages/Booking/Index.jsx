@@ -1,12 +1,26 @@
-import {AppBar, Box, Button, Container, CssBaseline, Grid, Paper, Stack, Toolbar, Typography} from "@mui/material";
+import {
+    AppBar,
+    Box,
+    Button,
+    Container,
+    CssBaseline,
+    Grid,
+    IconButton,
+    Paper,
+    Stack,
+    Toolbar,
+    Typography
+} from "@mui/material";
 import DateRangeOutlinedIcon from '@mui/icons-material/DateRangeOutlined';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import PunchClockOutlinedIcon from '@mui/icons-material/PunchClockOutlined';
 import RadioButtonUncheckedOutlinedIcon from '@mui/icons-material/RadioButtonUncheckedOutlined';
+import NavigateBeforeOutlinedIcon from '@mui/icons-material/NavigateBeforeOutlined';
 import Calendar from "@/Pages/Booking/Calendar.jsx";
 import Information from "@/Pages/Booking/Information";
 import {useState} from "react";
+import BookingCode from "@/Pages/Booking/BookingCode.jsx";
 
 function Layout({ children }) {
     return (
@@ -53,17 +67,18 @@ const STEPS = [
     },
     {
         id: 2,
-        route: "BokkingCode",
-        description: "BokkingCode"
+        route: "BookingCode",
+        description: "BookingCode"
     },
 ];
-export default function Index({ timeSlots, user }) {
+export default function Index({ user }) {
     const [dateTime, setDateTime] = useState({
         selectedDate: null,
         selectedTimeSlot: null,
         bookingDateTime: null
     });
     const [steps, setSteps] = useState(STEPS[0]);
+    const [triggerSubmit, setTriggerSubmit] = useState(false);
 
     const handleDateTimeChange = (newDateTime) => {
         console.log('newDateTimeParent: ', newDateTime)
@@ -79,11 +94,35 @@ export default function Index({ timeSlots, user }) {
         if(!STEPS[position]){
             position = 0;
         }
+        console.log(position)
+        if (position === 2) {
+            triggerFormSubmit()
+        }
         setSteps(STEPS[position])
     };
 
-    const submitInformation = (e) => {
-        console.log("🚀 ~ submitInformation ~ e:", e)
+    const handleBackOneStep = () => {
+        const getStep = STEPS.filter(e => e.id == steps.id)[0];
+        let position = getStep.id - 1;
+
+        if (position === 2) {
+            triggerFormSubmit()
+        }
+
+        setSteps(STEPS[position])
+    }
+
+    const triggerFormSubmit = () => {
+        setTriggerSubmit(true);
+    };
+
+    const submitInformation = (event) => {
+        event.preventDefault();
+        console.log("🚀 ~ submitInformation ~ e:", event)
+        const formData = new FormData(event.target);
+        const data = Object.fromEntries(formData.entries());
+        console.log(data);
+        setTriggerSubmit(false);
     };
     return (
         <Layout>
@@ -126,18 +165,29 @@ export default function Index({ timeSlots, user }) {
                     </Box>
                     <Box width={'70%'} sx={{ display: 'flex', flexDirection: 'column', maxHeight:'800px' }} className="showAllBar" >
                         <Box component="header" sx={{ py: 2, px: 2, boxShadow:'0 2px 3px rgba(26, 44, 55, 0.15)', textAlign: 'left' }}>
-                            <Typography variant="h5">
-                                {steps.description}
-                            </Typography>
+                            <Stack direction={'row'} alignItems={'center'}>
+                                {steps.route != 'calendar' && <IconButton onClick={handleBackOneStep}>
+                                    <NavigateBeforeOutlinedIcon />
+                                </IconButton>}
+                                <Typography variant="h5">
+                                    {steps.description}
+                                </Typography>
+                            </Stack>
                         </Box>
                         <Box component="section" sx={{ overflowY: 'auto', p: 2 }}>
-                            {steps.route == 'calendar' ? (<Calendar timeSlots={timeSlots} dateTime={dateTime} onDateTimeChange={handleDateTimeChange} />): null}
-                            {steps.route == 'information' ? (<Information submitInformation={submitInformation} />): null}
+                            {steps.route == 'calendar' ? (
+                                <Calendar
+                                    dateTime={dateTime}
+                                    onDateTimeChange={handleDateTimeChange}
+                                    user={user}
+                                />): null}
+                            {steps.route == 'information' ? (<Information triggerSubmit={triggerSubmit} submitInformation={submitInformation} />): null}
+                            {steps.route == 'BookingCode' ? (<BookingCode />): null}
                         </Box>
                         <Box component="footer" sx={{ py: 2, px: 2, boxShadow:'0 -2px 3px rgba(26, 44, 55, 0.15)', color: 'white', textAlign: 'right' }}>
                             {steps.route == 'calendar' ? (<Button variant="contained" color="primary" onClick={()=>handleNextStep()}>Continue</Button>): null}
                             {steps.route == 'information' ? (<Button variant="contained" color="primary" onClick={()=>handleNextStep()}>Continue</Button>): null}
-                            {steps.route == 'BokkingCode' ? (<Button variant="contained" color="primary" onClick={()=>handleNextStep()}>Continue</Button>): null}
+                            {steps.route == 'BookingCode' ? (<Button variant="contained" color="primary" onClick={()=>handleNextStep()}>Continue</Button>): null}
                         </Box>
                     </Box>
                 </Stack>

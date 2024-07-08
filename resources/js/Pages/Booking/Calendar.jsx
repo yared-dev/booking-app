@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { startOfMonth, endOfMonth, eachDayOfInterval, format, addMonths, subMonths, setMonth, setYear } from 'date-fns';
-import {Container, Grid, MenuItem, Select, IconButton, Typography, Button, Box, CssBaseline} from '@mui/material';
+import {Grid, MenuItem, Select, IconButton, Typography, Box, CssBaseline} from '@mui/material';
 import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
 import {startOfWeek} from "date-fns/startOfWeek";
 import {endOfWeek} from "date-fns/endOfWeek";
 import {parseISO} from "date-fns/parseISO";
 import {set} from "date-fns/set";
-import {router} from "@inertiajs/react";
 
-const Calendar = ({ timeSlots, dateTime, onDateTimeChange }) => {
+const Calendar = ({ dateTime, onDateTimeChange, user }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [days, setDays] = useState([]);
     const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    const [timeSlots, setTimeSlots] = useState(null);
 
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
@@ -118,9 +119,26 @@ const Calendar = ({ timeSlots, dateTime, onDateTimeChange }) => {
         console.log(day);
         setSelectedTimeSlot(null);
         setBookingDateTime(null);
-        router.post(route('booking.available-slots'), {
+
+        axios.post(route('booking.available-slots'), {
+            day: day,
+            employee: user.id
+        })
+            .then(response => {
+                console.log(response)
+                setSelectedDate(day);
+                setSelectedTimeSlot(response.data.timeSlots['1_hour_intervals'][0]);
+                setTimeSlots(response.data.timeSlots);
+                formatDayString()
+            })
+            .catch(error => {
+                console.log(error)
+                //setError(error.response ? error.response.data.message : 'An error occurred');
+            });
+
+        /*router.post(route('booking.available-slots'), {
                 day: day,
-                employee: 3
+                employee: user.id
             },
             {
                 onSuccess: (response) => {
@@ -133,7 +151,7 @@ const Calendar = ({ timeSlots, dateTime, onDateTimeChange }) => {
                     console.log(error);
                 }
             }
-        );
+        );*/
     }
 
     return (

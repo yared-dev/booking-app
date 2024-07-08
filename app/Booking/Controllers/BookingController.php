@@ -3,8 +3,10 @@
 namespace App\Booking\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Inertia\Inertia;
 
 class BookingController extends Controller
@@ -18,13 +20,20 @@ class BookingController extends Controller
 
     public function availableSlots(Request $request)
     {
+        $user = User::where('id', $request->get('employee'))->first();
+
+        if (!$user->hasRole('employee')) {
+            return redirect()->back()->withErrors(
+                ['code' => 419, 'message' => 'An error occurred while creating the employee.'],
+                'employeeError'
+            );
+        }
+
         $initialDate = Carbon::parse($request->get('day'))->toDateString();
 
         $timeSlots = $this->generateTimeSlots($initialDate);
 
-        return Inertia::render('Booking/Index', [
-            'timeSlots' => $timeSlots,
-        ]);
+        return response()->json(['timeSlots' => $timeSlots]);
     }
 
     private function generateTimeSlots($date)

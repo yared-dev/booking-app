@@ -3,7 +3,7 @@ import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFnsV3";
 import {Box, Button, Divider, TextField, Typography,FormControlLabel, Checkbox} from "@mui/material";
 
 import { DateRangePicker, SingleInputDateRangeField } from '@mui/x-date-pickers-pro';
-import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
+import Grid from '@mui/material/Grid';
 
 import {useState} from "react";
 import AddIcon from '@mui/icons-material/Add';
@@ -40,7 +40,7 @@ const DaysOff = ({ daysOff }) => {
         <Grid container columnGap={2} rowGap={1}>
             <Grid item xs={12} sm={"auto"}  sx={{border:"1px solid red"}}>
             <LocalizationProvider  dateAdapter={AdapterDateFns}>
-                    
+
                         <DatePicker
                             sx={{width:'100%'}}
                             views={['year']}
@@ -53,7 +53,7 @@ const DaysOff = ({ daysOff }) => {
                             }}
                             renderInput={(params) => <TextField {...params}  label="Select Year" />}
                         />
-                    
+
                 </LocalizationProvider>
             </Grid>
             <Grid item xs={12} sm={"auto"} smOffset={"auto"} sx={{border:"1px solid blue"}} display={"flex"} gap={"1rem"} alignItems={"center"} justifyContent={"space-between"}>
@@ -74,7 +74,7 @@ const DaysOff = ({ daysOff }) => {
             </Grid>
             <Grid item xs={12} sm={12}>
                 <Grid container margin={"auto"} p={2} sx={{ border: "1px solid #ECECEC" }}>
-                
+
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <DateRangePicker
   slots={{ field: SingleInputDateRangeField }}
@@ -82,13 +82,13 @@ const DaysOff = ({ daysOff }) => {
 />
 
                 </LocalizationProvider>
-                
+
                 </Grid>
             </Grid>
         </Grid>
 
             <Box display={'flex'} justifyContent={'space-between'}>
-                
+
 
                 <Button>Add Day Off</Button>
 

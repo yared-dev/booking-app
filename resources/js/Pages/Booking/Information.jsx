@@ -54,7 +54,7 @@ const VACUNE = [
         label: "No",
     },
 ];
-const Information = ({ submitInformation }) => {
+const Information = ({ triggerSubmit, submitInformation }) => {
     const label = { inputProps: { "aria-label": "Checkbox demo" } };
     const theme = createTheme();
 
@@ -80,6 +80,13 @@ const Information = ({ submitInformation }) => {
             reset("password");
         };
     }, []);
+
+    useEffect(() => {
+        console.log('info form ', triggerSubmit);
+        if (triggerSubmit) {
+            document.getElementById('hiddenSubmitButton').click();
+        }
+    }, [triggerSubmit]);
 
     const isLargeScreen = useMediaQuery(theme.breakpoints.up("sm"));
 
@@ -511,6 +518,7 @@ const Information = ({ submitInformation }) => {
                         />
                     </Grid>
                 </Grid>
+                <Button type={'submit'} id="hiddenSubmitButton" hidden>Submit</Button>
             </form>
         </Box>
     );
