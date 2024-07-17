@@ -7,24 +7,17 @@ import {endOfWeek} from "date-fns/endOfWeek";
 import {parseISO} from "date-fns/parseISO";
 import {set} from "date-fns/set";
 
-const Calendar = ({ dateTime, onDateTimeChange, user }) => {
-    const [currentDate, setCurrentDate] = useState(new Date());
-    const [days, setDays] = useState([]);
+const Calendar = ({ dateTime, onDateTimeChange, calendarState, onCalendarChange, user }) => {
+    const { currentDate, days, timeSlots } = calendarState;
     const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-    const [timeSlots, setTimeSlots] = useState(null);
-
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
-    const [bookingDateTime, setBookingDateTime] = useState(null);
-
     const resetSelection = () => {
-        setSelectedDate(null);
-        setSelectedTimeSlot(null);
-        setBookingDateTime(null);
-    }
-
-
+        onDateTimeChange({
+            selectedDate: null,
+            selectedTimeSlot: null,
+            bookingDateTime: null
+        });
+    };
 
     useEffect(() => {
         const start = startOfMonth(currentDate);
@@ -36,29 +29,32 @@ const Calendar = ({ dateTime, onDateTimeChange, user }) => {
 
         const fullInterval = eachDayOfInterval({ start: startWeek, end: endWeek });
 
-        setDays(fullInterval);
+        onCalendarChange({ ...calendarState, days: fullInterval });
     }, [currentDate]);
 
     const handleMonthChange = (e) => {
         resetSelection();
         const newDate = setMonth(currentDate, e.target.value);
-        setCurrentDate(newDate);
+        onCalendarChange({ ...calendarState, currentDate: newDate });
     };
 
     const handleYearChange = (e) => {
         resetSelection();
         const newDate = setYear(currentDate, e.target.value);
-        setCurrentDate(newDate);
+        onCalendarChange({ ...calendarState, currentDate: newDate });
     };
 
     const handlePrevMonth = () => {
         resetSelection();
-        setCurrentDate(subMonths(currentDate, 1));
-    }
+        const newDate = subMonths(currentDate, 1);
+        onCalendarChange({ ...calendarState, currentDate: newDate });
+    };
+
     const handleNextMonth = () => {
         resetSelection();
-        setCurrentDate(addMonths(currentDate, 1));
-    }
+        const newDate = addMonths(currentDate, 1);
+        onCalendarChange({ ...calendarState, currentDate: newDate });
+    };
 
     const getWeeks = () => {
         const weeks = [];
@@ -79,80 +75,52 @@ const Calendar = ({ dateTime, onDateTimeChange, user }) => {
         return weeks;
     };
 
-
-
-    const formatDayString = () => {
+    const formatDayString = (selectedDate, selectedTimeSlot, timeSlots) => {
         if (!selectedDate) {
-            return;
+            return null;
         }
 
         let date = parseISO(selectedDate.toISOString());
-
-        // Extract hours, minutes, and seconds from the time string
         const [hours, minutes, seconds] = selectedTimeSlot ? selectedTimeSlot.split(':') : timeSlots['1_hour_intervals'][1].split(':');
-
-        // Set the hours, minutes, and seconds to the parsed date
         const parsedDate = set(date, { hours, minutes, seconds });
+        return format(date, 'MMMM dd, yyyy') + ' - ' + format(parsedDate, 'h:mm a');
+    };
 
-        // Format the date components
-        const formatDateTime = format(date, 'MMMM dd, yyyy') + ' - ' + format(parsedDate, 'h:mm a');
-        setBookingDateTime(formatDateTime);
-    }
-
-    useEffect(() => {
-
-            formatDayString()
-            //onDateTimeChange({ selectedDate, selectedTimeSlot: selectedTimeSlot, bookingDateTime: bookingDateTime });
-
-    }, [selectedTimeSlot]);
-
-    useEffect(() => {
-        onDateTimeChange({ selectedDate, selectedTimeSlot: selectedTimeSlot, bookingDateTime: bookingDateTime });
-    }, [bookingDateTime]);
-
-    const handleSelectTimeSlot = (index) => {
-        console.log(index);
-        setSelectedTimeSlot(index);
-    }
+    const handleSelectTimeSlot = (timeSlot) => {
+        const bookingDateTime = formatDayString(dateTime.selectedDate, timeSlot, timeSlots);
+        onDateTimeChange({
+            ...dateTime,
+            selectedTimeSlot: timeSlot,
+            bookingDateTime: bookingDateTime
+        });
+    };
 
     const handleFetchDaySlots = (day) => {
-        console.log(day);
-        setSelectedTimeSlot(null);
-        setBookingDateTime(null);
+        onDateTimeChange({
+            ...dateTime,
+            selectedDate: day,
+            selectedTimeSlot: null,
+            bookingDateTime: null
+        });
 
         axios.post(route('booking.available-slots'), {
             day: day,
             employee: user.id
         })
             .then(response => {
-                console.log(response)
-                setSelectedDate(day);
-                setSelectedTimeSlot(response.data.timeSlots['1_hour_intervals'][0]);
-                setTimeSlots(response.data.timeSlots);
-                formatDayString()
+                const initialTimeSlot = response.data.timeSlots['1_hour_intervals'][0];
+                const bookingDateTime = formatDayString(day, initialTimeSlot, response.data.timeSlots);
+                onCalendarChange({ ...calendarState, timeSlots: response.data.timeSlots });
+                onDateTimeChange({
+                    selectedDate: day,
+                    selectedTimeSlot: initialTimeSlot,
+                    bookingDateTime: bookingDateTime
+                });
             })
             .catch(error => {
-                console.log(error)
-                //setError(error.response ? error.response.data.message : 'An error occurred');
+                console.log(error);
             });
-
-        /*router.post(route('booking.available-slots'), {
-                day: day,
-                employee: user.id
-            },
-            {
-                onSuccess: (response) => {
-                    console.log(response);
-                    setSelectedDate(day);
-                    setSelectedTimeSlot(response.props.timeSlots['1_hour_intervals'][0]);
-                    formatDayString()
-                },
-                onError: (error) => {
-                    console.log(error);
-                }
-            }
-        );*/
-    }
+    };
 
     return (
         <Box width={'100%'}>
@@ -189,41 +157,44 @@ const Calendar = ({ dateTime, onDateTimeChange, user }) => {
             </Grid>
             <Grid container spacing={1} justifyContent="space-evenly" py={2}>
                 {daysOfWeek.map((day) => (
-                    <Grid item xs={1} key={day} sx={{padding: 1, textAlign: 'center', fontWeight: 'bold' }}>
+                    <Grid item xs={1} key={day} sx={{ padding: 1, textAlign: 'center', fontWeight: 'bold' }}>
                         {day}
                     </Grid>
                 ))}
             </Grid>
             {getWeeks().map((week, weekIndex) => (
                 <Grid container spacing={1} justifyContent="space-evenly" key={weekIndex} py={1}>
-                    {week.map((day, dayIndex) => (
-                        <Grid
-                            item
-                            key={dayIndex}
-                            xs={1}
-                            onClick={() => handleFetchDaySlots(day)}
-                            sx={{
-                                padding: 1,
-                                border: '1px solid #ccc',
-                                borderRadius: '4px',
-                                textAlign: 'center',
-                                cursor: 'pointer',
-                                backgroundColor: currentDate.getMonth() === day.getMonth() ? 'white' : '#f0f0f0',
-                                '&:hover': {
-                                    backgroundColor:
-                                        currentDate.getMonth() === day.getMonth() ? '#e0e0e0' : '#f0f0f0', // Different hover colors
-                                    borderColor: '#999',
-                                },
-                            }}
-                        >
-                            {format(day, 'd')}
-                        </Grid>
-                    ))}
+                    {week.map((day, dayIndex) => {
+                        const isCurrentMonth = currentDate.getMonth() === day.getMonth();
+                        const isSelectedDate = dateTime.selectedDate && day.getTime() === dateTime.selectedDate.getTime();
+                        return (
+                            <Grid
+                                item
+                                key={dayIndex}
+                                xs={1}
+                                onClick={() => handleFetchDaySlots(day)}
+                                sx={{
+                                    padding: 1,
+                                    border: '1px solid #ccc',
+                                    borderRadius: '4px',
+                                    textAlign: 'center',
+                                    cursor: 'pointer',
+                                    backgroundColor: isSelectedDate ? '#e0f7fa' : isCurrentMonth ? 'white' : '#f0f0f0',
+                                    '&:hover': {
+                                        backgroundColor: isCurrentMonth ? '#e0e0e0' : '#f0f0f0',
+                                        borderColor: '#999',
+                                    },
+                                }}
+                            >
+                                {format(day, 'd')}
+                            </Grid>
+                        );
+                    })}
                 </Grid>
             ))}
-            {selectedDate && (
+            {dateTime.selectedDate && (
                 <>
-                    <Typography variant="h6" gutterBottom>{bookingDateTime}</Typography>
+                    <Typography variant="h6" gutterBottom>{dateTime.bookingDateTime}</Typography>
                     <Grid container spacing={0} justifyContent="space-evenly" sx={{ marginTop: 2 }}>
                         {timeSlots && timeSlots['1_hour_intervals'].map((value, index) => (
                             <Grid key={index}
@@ -234,9 +205,10 @@ const Calendar = ({ dateTime, onDateTimeChange, user }) => {
                                       borderRadius: '4px',
                                       textAlign: 'center',
                                       cursor: 'pointer',
+                                      backgroundColor: dateTime.selectedTimeSlot === value ? '#e0f7fa' : '',
                                       '&:hover': {
-                                          backgroundColor: '#f0f0f0', // Change to the desired hover background color
-                                          borderColor: '#999', // Change to the desired hover border color
+                                          backgroundColor: '#f0f0f0',
+                                          borderColor: '#999',
                                       },
                                   }}
                                   item xs={12} sm={5} onClick={() => handleSelectTimeSlot(value)}>
