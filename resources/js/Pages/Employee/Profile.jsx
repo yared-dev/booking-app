@@ -5,6 +5,7 @@ import NewAuthenticatedLayout from "@/Layouts/NewAuthenticatedLayout.jsx";
 import WorkingHours from "@/Pages/Admin/Employee/Partials/WorkingHours.jsx";
 import DaysOff from "@/Pages/Admin/Employee/Partials/DaysOff.jsx";
 import LanguageIcon from '@mui/icons-material/Language';
+import SpecialDays from "../Admin/Employee/Partials/SpecialDays";
 
 export default function Profile({ auth, timeIntervals, workingHours }) {
     const { errors } = usePage().props
@@ -121,6 +122,15 @@ export default function Profile({ auth, timeIntervals, workingHours }) {
                 <TabPanel value={value} index={2}>
                     <DaysOff />
                 </TabPanel>
+                <Suspense fallback={<div>Loading...</div>}>
+                    <TabPanel value={value} index={3}>
+                        <SpecialDays
+                            intervals={timeIntervals}
+                            workingHours={workingHours}
+                            user={auth.user}
+                        />
+                    </TabPanel>
+                </Suspense>
             </Box>
 
 
