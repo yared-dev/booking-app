@@ -42,7 +42,7 @@ const VACUNE = [
     { value: 1, label: "No" },
 ];
 
-const Information = ({ informationState, onInformationChange, triggerSubmit, submitInformation }) => {
+const Information = ({ informationState, onInformationChange, submitInformation }) => {
     const { data, setData, post, processing, errors, reset } = useForm(informationState);
 
     useEffect(() => {
@@ -50,13 +50,6 @@ const Information = ({ informationState, onInformationChange, triggerSubmit, sub
             reset("password");
         };
     }, []);
-
-    useEffect(() => {
-        console.log('info form ', triggerSubmit);
-        if (triggerSubmit) {
-            document.getElementById('hiddenSubmitButton').click();
-        }
-    }, [triggerSubmit]);
 
     useEffect(() => {
         onInformationChange(data);
@@ -335,7 +328,6 @@ const Information = ({ informationState, onInformationChange, triggerSubmit, sub
                         <InputLabel htmlFor="reasonHealing" value="Reason for the healing session (max 1000 characters):" />
                     </Grid>
                 </Grid>
-                <Button type={'submit'} id="hiddenSubmitButton" hidden>Submit</Button>
             </form>
         </Box>
     );

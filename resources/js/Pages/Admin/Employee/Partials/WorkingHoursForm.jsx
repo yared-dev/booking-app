@@ -66,8 +66,8 @@ export default function WorkingHoursForm({ intervals, workingHour, user, allDays
     const [workingHourData, setWorkingHourData] = useState({});
 
     useEffect(() => {
-        console.log('se actualiza form ', workingHour)
-        setWorkingHourData(workingHour)
+        console.log('se actualiza form ', workingHour);
+        setWorkingHourData(workingHour);
     }, [workingHour]);
 
     const {
@@ -77,6 +77,7 @@ export default function WorkingHoursForm({ intervals, workingHour, user, allDays
         processing,
         reset: resetInertiajs,
         errors,
+        transform,
         clearErrors: clearErrorsInertiajs
     } = useFormInertiajs({
         day: workingHourData.key,
@@ -86,62 +87,50 @@ export default function WorkingHoursForm({ intervals, workingHour, user, allDays
 
     useEffect(() => {
         console.log('workingHourData:', workingHourData);
-        console.log('start_time:', workingHourData.start_time);
         setData({
             day: workingHourData.key,
             start: workingHourData.start_time || null,
             end: workingHourData.end_time || null,
         });
-    }, [workingHourData, workingHourData]);
+    }, [workingHourData]);
 
-    useEffect(() => {
-        console.log('se actualiza data form ', data);
-    }, [data]);
+    const handleIntervalSelection = async (formData) => {
+        console.log({ ...formData, employee_id: user.id });
 
-    const handleIntervalSelection = (e) => {
-        e.preventDefault();
-        console.log({ ...data, employee_id: user.id })
+        const body = {
+            day: workingHourData.key,
+            end: formData.txtEndHour,
+            start: formData.txtStartHour
+        }
 
-        post(route('admin.working-hours.store', { id: user.id }),
-            {
-                preserveState: true,
-                preserveScroll: true,
-                errorBag: 'workingHours',
-                onSuccess: () => {
-                    clearErrors()
-                },
-                onError: (error) => {
-                    console.log(error)
-                }
+        try {
+            const response = await axios.post(route('admin.working-hours.store', { id: user.id }), body)
+            console.log(response)
+        } catch (error) {
+            console.log(error)
+        }
 
-            })
     };
 
     const applyEveryDay = () => {
-        post(route('admin.working-hours.every-day', { id: user.id }),
-            {
-                preserveState: true,
-                preserveScroll: true,
-                errorBag: 'applyEveryDay',
-                onSuccess: () => {
-                    clearErrors()
-                },
-                onError: (error) => {
-                    console.log(error)
-                }
+        post(route('admin.working-hours.every-day', { id: user.id }), {
+            preserveState: true,
+            preserveScroll: true,
+            errorBag: 'applyEveryDay',
+            onSuccess: () => {
+                clearErrorsInertiajs();
+            },
+            onError: (error) => {
+                console.log(error);
+            }
+        });
+    };
 
-            })
-    }
-    //---------------------------##################-------------------
-
-
-    //Options for radioGroup
     const rdOptions = [
         { id: "work", label: "Work Hours" },
         { id: "break", label: "Break" },
     ];
 
-    // data for SERVICES select from database
     const dataServices = [
         { id: 1, name: "service test 1" },
         { id: 2, name: "service test 2" },
@@ -151,86 +140,75 @@ export default function WorkingHoursForm({ intervals, workingHour, user, allDays
         { id: 6, name: "long long service name test 5" },
     ];
 
-
-    //default values for FormControll react-hook-form
     const defaultValues = {
         typeRecord: rdOptions[0],
         txtStartHour: null,
         txtEndHour: null,
         arrayServices: [],
-    }
+    };
 
-
-    //react-hook-form
-    const { handleSubmit, control, setValue, reset, clearErrors } = useFormReactHook(
-        { defaultValues: defaultValues, }
-    )
+    const { handleSubmit,
+        control,
+        setValue,
+        reset,
+        clearErrors
+    } = useFormReactHook({
+        defaultValues: defaultValues,
+    });
 
     const typeRecordValue = useWatch({ control, name: "typeRecord" });
 
-
-    //For RadioButtonGroup
     const [rdDisabledID, setRdDisabledID] = useState(null);
-
-    //Expand box when "+" clicked
     const [mainBoxExpanded, setMainBoxExpanded] = useState(false);
 
-
     const handleExpandedMainBox = () => {
-        reset(); clearErrors(); setRdDisabledID(null);
+        reset();
+        clearErrors();
+        setRdDisabledID(null);
         setMainBoxExpanded(!mainBoxExpanded);
-    }
+    };
 
-
-    //data when SAVE button submit, [Work Hours] or [Breaks]
-    const [editObjectID, setEditObjectID] = useState(null); //For edit
+    const [editObjectID, setEditObjectID] = useState(null);
     const [objecDayDataCreated, setObjectDayDataCreated] = useState([]);
 
-    const onSubmit = (data) => {
-
+    const onSubmit = (formData) => {
         if (typeRecordValue?.id === rdOptions[1].id) {
-            delete data.arrayServices;
+            delete formData.arrayServices;
         }
 
         if (editObjectID != null) {
-            objecDayDataCreated[editObjectID] = data;
-
+            objecDayDataCreated[editObjectID] = formData;
         } else {
-            setObjectDayDataCreated([...objecDayDataCreated, data]);
+            setObjectDayDataCreated([...objecDayDataCreated, formData]);
         }
+
+        handleIntervalSelection(formData);
         reset();
         setEditObjectID(null);
         setRdDisabledID(null);
-    }
+    };
 
-
-
-    //----------------### EDIT AND DELETE   ### -------------------------
-    //edit clicked
     const editDayCreated = (currentObject, index) => {
         reset();
         clearErrors();
         setEditObjectID(index);
-        if (currentObject.arrayServices) { setValue("arrayServices", currentObject.arrayServices) }
+        if (currentObject.arrayServices) { setValue("arrayServices", currentObject.arrayServices); }
 
         setValue("typeRecord", currentObject.typeRecord);
         setValue("txtStartHour", currentObject.txtStartHour);
         setValue("txtEndHour", currentObject.txtEndHour);
-        setRdDisabledID(currentObject.typeRecord.id)
+        setRdDisabledID(currentObject.typeRecord.id);
         setMainBoxExpanded(true);
-    }
+    };
 
-    //delete clicked
     const deleteDayCreated = (index) => {
         setObjectDayDataCreated((prevData) =>
             prevData.filter((_, i) => i !== index)
         );
-    }
-
+    };
 
     return (
         <Grid container alignItems={"center"}>
-            {/*HEADER DAY MONDAY TO FRIDAY*/}
             <Grid container sx={{ backgroundColor: "#E5E5E5" }} className="rounded-t-lg" px={2} alignItems="center" xs={12}>
                 <Grid xs ><Typography variant="body1">{workingHourData.value}</Typography></Grid>
                 <Grid xs={"auto"}><Box>
@@ -240,12 +218,9 @@ export default function WorkingHoursForm({ intervals, workingHour, user, allDays
                     </IconButton>
                 </Box></Grid>
             </Grid>
-            {/*----------####-------------*/}
 
-            {/*CONTAINER TO ADD HOURS*/}
             {mainBoxExpanded && (
                 <Grid xs={12} container p={2} sx={{ border: "1px solid #ECECEC" }} rowGap={2}>
-                    {/*RADIO BUTTONS*/}
                     <Grid xs={12} >
                         <FormRadioGroup
                             row
@@ -259,10 +234,8 @@ export default function WorkingHoursForm({ intervals, workingHour, user, allDays
                             bpSize="small"
                             disabledExcept={rdDisabledID}
                         />
-
                     </Grid>
-                    {/*--------------#####---------*/}
-                    {/*TEXT FIELDS (3)*/}
+
                     <Grid xs={12} container columnGap={3} rowGap={2}>
                         <Grid xs={12} sm={12}><Typography variant="body1">{`${typeRecordValue?.id === rdOptions[0].id ? "Work Hours" : "Break Hours"}`}</Typography></Grid>
                         <Grid xs={12} sm={2.5}>
@@ -278,7 +251,7 @@ export default function WorkingHoursForm({ intervals, workingHour, user, allDays
                                 size="small"
                             />
                         </Grid>
-                        <Grid xs={12} sm={2.5} >
+                        <Grid xs={12} sm={2.5}>
                             <FormTextAutoComplete
                                 name={"txtEndHour"}
                                 control={control}
@@ -307,25 +280,22 @@ export default function WorkingHoursForm({ intervals, workingHour, user, allDays
                                 />
                             </Grid>
                         )}
-
                     </Grid>
-                    {/*BUTTONS CANCEL, SAVE*/}
+
                     <Grid container xs={12} columnGap={2}>
                         <Grid xs={"auto"} xsOffset={"auto"}>
                             <Button variant="outlined" onClick={() => setMainBoxExpanded(false)}>Cancel</Button>
                         </Grid>
-                        <Grid xs={"auto"} >
-                            <Button variant="contained" onClick={handleSubmit(onSubmit)} >Save</Button>
+                        <Grid xs={"auto"}>
+                            <Button variant="contained" onClick={handleSubmit(onSubmit)}>Save</Button>
                         </Grid>
                     </Grid>
                 </Grid>
             )}
-            {/*----------####-------------*/}
-            {/*CONTAINER FOR ROWS RESULT*/}
-            {objecDayDataCreated.map((refObject, index) => {
 
+            {objecDayDataCreated.map((refObject, index) => {
                 return (
-                    <Grid key={index} xs={12} container py={1} px={2} className={`${index == objecDayDataCreated.length - 1 ? "rounded-b-lg" : ""}`} alignItems={"center"} sx={{ border: "1px solid #ECECEC" }} color="gray" columnGap={3}>
+                    <Grid key={index} xs={12} container py={1} px={2} className={`${index === objecDayDataCreated.length - 1 ? "rounded-b-lg" : ""}`} alignItems={"center"} sx={{ border: "1px solid #ECECEC" }} color="gray" columnGap={3}>
                         <Grid xs sm={"auto"} order={{ xs: 1, sm: 1 }}>
                             <Typography variant="body1">{`${refObject.txtStartHour} - ${refObject.txtEndHour}`}</Typography>
                         </Grid>
@@ -335,7 +305,6 @@ export default function WorkingHoursForm({ intervals, workingHour, user, allDays
                                     refObject.arrayServices.map((value, index) => (
                                         <Chip key={index} label={value.name} />
                                     ))
-
                                 ) : (
                                     <Chip label="Break" />
                                 )}
@@ -344,12 +313,10 @@ export default function WorkingHoursForm({ intervals, workingHour, user, allDays
                         <Grid xs={"auto"} order={{ xs: 2, sm: 3 }}>
                             <IconButton onClick={() => editDayCreated(refObject, index)}><EditIcon /></IconButton>
                             <IconButton onClick={() => deleteDayCreated(index)}><DeleteOutlinedIcon /></IconButton>
-
                         </Grid>
                     </Grid>
                 );
             })}
-
         </Grid>
     );
 }

@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Models\Category;
+use App\Admin\Models\Service;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -45,6 +46,7 @@ class CategoryController extends Controller
 
         return Inertia::render('Admin/Service', [
             'categories' => Auth::user()->category,
+            'services' => Service::with('employees', 'category')->get()
         ]);
     }
 

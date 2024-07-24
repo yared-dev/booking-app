@@ -40,6 +40,11 @@ class EmployeeController extends Controller
         ]);
     }
 
+    public function list()
+    {
+        return $this->employeeRepository->findAll();
+    }
+
     public function create()
     {
 

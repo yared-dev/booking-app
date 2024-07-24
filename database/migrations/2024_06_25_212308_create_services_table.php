@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('services', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->foreignId('category_id')->constrained()->onDelete('cascade');
+            $table->integer('duration'); // Assuming duration is in minutes
+            $table->decimal('price', 8, 2); // Assuming price is a decimal value
             $table->timestamps();
         });
     }

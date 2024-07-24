@@ -26,7 +26,7 @@ export default function Profile({ auth, employee }) {
         lastName: employee ? employee.lastName : "",
         email: employee ? employee.email : "",
         username: employee ? employee.username : "",
-        password: "",
+        password: "password",
         phoneNumber: employee ? employee.phoneNumber : "",
         timeZone: employee ? employee.timeZone : "",
     });
@@ -209,14 +209,14 @@ export default function Profile({ auth, employee }) {
                         </Box>
                     </Grid>
                     <Grid item xs={12} sm={12} sx={{display:"flex", boxSizing:"border-box", flexDirection:"column", height:"15rem"}}>
-                        
+
                     <Box sx={{display: "flex", justifyContent:"end" }}>
                                 <Button variant="outlined" onClick={() => setSelectedComponent('QuillEditor')}>Text mode</Button>
                                 <Button variant="contained" onClick={() => setSelectedComponent('TextField')}>HTML mode</Button>
                             </Box>
                         {renderSelectedComponent()}
                     </Grid>
-                  
+
                 </Grid>
 
                 <Box mt={3}>

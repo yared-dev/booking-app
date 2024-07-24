@@ -70,7 +70,7 @@ function Sidebar({ user, header, children }) {
                     </ListItemButton>
                 </ListItem>)}
                 {(user.roles[0].name === "admin" || user.roles[0].name === "employee") && (<ListItem disablePadding>
-                    <ListItemButton component={Link} href="#">
+                    <ListItemButton component={Link} href="{route('booking.appointment.index')}">
                         <ListItemIcon>
                             <InboxIcon />
                         </ListItemIcon>

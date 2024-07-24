@@ -2,6 +2,7 @@
 
 namespace App\Booking\Controllers;
 
+use App\Admin\Models\Employee;
 use App\Booking\Models\MagicLink;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -70,8 +71,22 @@ class AppointmentController extends Controller
             'user' => $user,
         ]);*/
 
+        $employee = Employee::with('services')->find($user->id);
+
         return Inertia::render('Booking/Index', [
             'user' => $user,
+            'service' => $employee->services[0]
         ]);
+    }
+
+    public function validateCode(Request $request)
+    {
+        $magicLink = MagicLink::where(['code' => $request->code, 'user_id' => $request->user_id])->first();
+
+        if (!$magicLink) {
+            return response()->json(['message' => 'Invalid magic link'], 404);
+        }
+
+        return response()->json(['message' => 'Code successfully validated'], 200);
     }
 }

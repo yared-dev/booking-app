@@ -30,6 +30,7 @@ Route::get('/', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');*/
 
 Route::get('appointment/{code}/{encryptedUserId}', [AppointmentController::class, 'handleMagicLink'])->name('appointment.index');
+Route::post('appointment/validateCode', [AppointmentController::class, 'validateCode'])->name('appointment.validateCode');
 
 /*Route::get("booking/{key}", [BookingController::class, 'index'])->name('booking.index');*/
 Route::post("booking/available-slots", [BookingController::class, 'availableSlots'])->name('booking.available-slots');
@@ -38,6 +39,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 
     Route::get('employee', [EmployeeController::class, 'index'])->name('admin.employee.index');
+    Route::get('employee-list', [EmployeeController::class, 'list'])->name('admin.employee.list');
     Route::get('employee/create', [EmployeeController::class, 'create'])->name('admin.employee.create');
     Route::post('employee', [EmployeeController::class, 'store'])->name('admin.employee.store');
     Route::put('employee/{id}', [EmployeeController::class, 'update'])->name('admin.employee.update');
@@ -45,6 +47,8 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 
 
     Route::get('service', [ServiceController::class, 'index'])->name('admin.service.index');
+    Route::post('service', [ServiceController::class, 'store'])->name('admin.service.store');
+
     Route::post('category', [CategoryController::class, 'store'])->name('admin.category.store');
 });
 

@@ -3,21 +3,21 @@ Accept: application/json
 Content-Type: application/json
 
 {
-    "email": "james@employee.com",
-    "password": "12345678"
+    "email": "watilyji@mailinator.com",
+    "password": "password"
 }
 
 ###
 GET https://booking-app.test/api/user
 Accept: application/json
 Content-Type: application/json
-Authorization: Bearer D7r2u6QqVa6bNwANZPUeNdkexgN39BWHf2fmJjVEe00cb05c
+Authorization: Bearer IgXsV62lR7ZZwe2ZGWZrJMqpgZs1FFId4XJOblJpea54809a
 
 ###
-GET https://booking-app.test/api/appointments/generate-magic-link?user=test@employee.com
+GET https://booking-app.test/api/appointments/generate-magic-link?user=watilyji@mailinator.com
 Accept: application/json
 Content-Type: application/json
-Authorization: Bearer D7r2u6QqVa6bNwANZPUeNdkexgN39BWHf2fmJjVEe00cb05c
+Authorization: Bearer IgXsV62lR7ZZwe2ZGWZrJMqpgZs1FFId4XJOblJpea54809a
 
 ###
 

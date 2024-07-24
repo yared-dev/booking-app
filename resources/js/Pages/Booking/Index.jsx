@@ -60,7 +60,7 @@ const STEPS = [
     { id: 2, route: 'BookingCode', description: 'Booking Code' },
 ];
 
-export default function Index({ user }) {
+export default function Index({ user, service }) {
     const [dateTime, setDateTime] = useState({
         selectedDate: null,
         selectedTimeSlot: null,
@@ -91,6 +91,10 @@ export default function Index({ user }) {
         remember: false,
     });
 
+    const [bookingCodeState, setBookingCodeState] = useState({
+        bookingCodeValidated: false,
+    });
+
     const [steps, setSteps] = useState(STEPS[0]);
     const [triggerSubmit, setTriggerSubmit] = useState(false);
 
@@ -104,6 +108,10 @@ export default function Index({ user }) {
 
     const handleInformationChange = (newInformationState) => {
         setInformationState(newInformationState);
+    };
+
+    const handleBookingCodeChange = (newBookingCodeState) => {
+        setBookingCodeState(newBookingCodeState);
     };
 
     const goToStep = (stepIndex) => {
@@ -126,17 +134,20 @@ export default function Index({ user }) {
         }
     };
 
-    const triggerFormSubmit = () => {
-        setTriggerSubmit(true);
-    };
+    const handleSave = () => {
+        const allData = {
+            dateTime,
+            calendarState,
+            informationState,
+            bookingCodeState
+        };
+        console.log('All Data to Save:', allData);
 
-    const submitInformation = (event) => {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const data = Object.fromEntries(formData.entries());
-        console.log(data);
-        setTriggerSubmit(false);
-        handleNextStep();
+        // You can send this data to your backend or handle it as needed
+        // For example:
+        // axios.post('/your-endpoint', allData)
+        //     .then(response => console.log(response))
+        //     .catch(error => console.error(error));
     };
 
     return (
@@ -202,16 +213,26 @@ export default function Index({ user }) {
                                 <Information
                                     informationState={informationState}
                                     onInformationChange={handleInformationChange}
-                                    triggerSubmit={triggerSubmit}
-                                    submitInformation={submitInformation}
                                 />
                             )}
-                            {steps.route === 'BookingCode' && <BookingCode />}
+                            {steps.route === 'BookingCode' && (
+                                <BookingCode
+                                    bookingCodeState={bookingCodeState}
+                                    onBookingCodeChange={handleBookingCodeChange}
+                                    service={service}
+                                    usedId={user.id}
+                                />
+                            )}
                         </Box>
                         <Box component="footer" sx={{ py: 2, px: 2, boxShadow: '0 -2px 3px rgba(26, 44, 55, 0.15)', color: 'white', textAlign: 'right' }}>
                             {steps.id < STEPS.length - 1 && (
                                 <Button variant="contained" color="primary" onClick={handleNextStep}>
                                     Continue <NavigateNextOutlined />
+                                </Button>
+                            )}
+                            {steps.id === STEPS[2].id && (
+                                <Button variant="contained" color="primary" disabled={!bookingCodeState.bookingCodeValidated} onClick={handleSave}>
+                                    Save
                                 </Button>
                             )}
                         </Box>

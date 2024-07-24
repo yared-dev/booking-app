@@ -29,7 +29,8 @@ class WorkingHoursController extends Controller
             $newDay->save();
         }
 
-        return redirect()->back()->with('success', 'Working hours updated successfully.');
+        return response()->json(['message' => 'Working hours updated successfully.']);
+        //return redirect()->back()->with('success', 'Working hours updated successfully.');
         //return redirect(route('admin.employee.edit', $id));
     }
 

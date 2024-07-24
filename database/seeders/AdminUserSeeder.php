@@ -19,7 +19,7 @@ class AdminUserSeeder extends Seeder
         if (!User::where('email', 'admin@booking.com')->exists()) {
             $admin = User::create([
                 'name' => 'Admin User',
-                'email' => 'booking.com',
+                'email' => 'admin@booking.com',
                 'password' => bcrypt('password'),
             ]);
 
