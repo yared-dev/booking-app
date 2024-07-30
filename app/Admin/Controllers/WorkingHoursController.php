@@ -15,10 +15,10 @@ class WorkingHoursController extends Controller
         $existingDay = WorkingHour::where('day_of_week', $request->day)
             ->where('user_id', $id)
             ->first();
-
         if ($existingDay) {
             $existingDay->start_time = $request->start;
             $existingDay->end_time = $request->end;
+            $existingDay->service_id = $request->arrayServices;
             $existingDay->save();
         } else {
             $newDay = new WorkingHour();
@@ -26,12 +26,11 @@ class WorkingHoursController extends Controller
             $newDay->day_of_week = $request->day;
             $newDay->start_time = $request->start;
             $newDay->end_time = $request->end;
+            $newDay->service_id = $request->arrayServices;
             $newDay->save();
         }
 
         return response()->json(['message' => 'Working hours updated successfully.']);
-        //return redirect()->back()->with('success', 'Working hours updated successfully.');
-        //return redirect(route('admin.employee.edit', $id));
     }
 
     public function setEveryDay(int $id, Request $request)
@@ -54,6 +53,7 @@ class WorkingHoursController extends Controller
             if ($existingDay) {
                 $existingDay->start_time = $request->start;
                 $existingDay->end_time = $request->end;
+                $existingDay->service_id = $request->arrayServices;
                 $existingDay->save();
             } else {
                 $newDay = new WorkingHour();
@@ -61,6 +61,7 @@ class WorkingHoursController extends Controller
                 $newDay->day_of_week = $day['key'];
                 $newDay->start_time = $request->start;
                 $newDay->end_time = $request->end;
+                $newDay->service_id = $request->arrayServices;
                 $newDay->save();
             }
         }

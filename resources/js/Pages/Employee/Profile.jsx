@@ -2,15 +2,16 @@ import { Head, Link, usePage } from "@inertiajs/react";
 import { lazy, Suspense, useState } from "react";
 import { Box, Paper, Tab, Tabs, TextField, MenuItem, OutlinedInput, InputAdornment } from "@mui/material";
 import NewAuthenticatedLayout from "@/Layouts/NewAuthenticatedLayout.jsx";
-import WorkingHours from "@/Pages/Admin/Employee/Partials/WorkingHours.jsx";
 import DaysOff from "@/Pages/Admin/Employee/Partials/DaysOff.jsx";
 import LanguageIcon from '@mui/icons-material/Language';
 import SpecialDays from "../Admin/Employee/Partials/SpecialDays";
 
 export default function Profile({ auth, timeIntervals, workingHours }) {
+    
     const { errors } = usePage().props
-
+    
     const EmployeeProfile = lazy(() => import('@/Pages/Admin/Employee/Partials/Profile.jsx'));
+    const WorkingHours = lazy(() => import('@/Pages/Admin/Employee/Partials/WorkingHours.jsx'));
 
     function a11yProps(index) {
         return {

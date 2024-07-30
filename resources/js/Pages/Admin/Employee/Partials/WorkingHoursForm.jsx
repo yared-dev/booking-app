@@ -64,11 +64,22 @@ const BpCheckedIcon = styled(BpIcon)({
 
 export default function WorkingHoursForm({ intervals, workingHour, user, allDays = false }) {
     const [workingHourData, setWorkingHourData] = useState({});
+    const [rdDisabledID, setRdDisabledID] = useState(null);
+    const [mainBoxExpanded, setMainBoxExpanded] = useState(false);
+    const [editObjectID, setEditObjectID] = useState(null);
+    const [objecDayDataCreated, setObjectDayDataCreated] = useState([]);
 
     useEffect(() => {
-        console.log('se actualiza form ', workingHour);
+        const defaultValues = {
+            typeRecord: rdOptions[0],
+            txtStartHour: workingHour.start_time,
+            txtEndHour: workingHour.end_time,
+            arrayServices: dataServices.filter(e => e.id === workingHour.service_id),
+        };
+        setObjectDayDataCreated([defaultValues])
         setWorkingHourData(workingHour);
     }, [workingHour]);
+
 
     const {
         data,
@@ -83,24 +94,28 @@ export default function WorkingHoursForm({ intervals, workingHour, user, allDays
         day: workingHourData.key,
         start: workingHourData.start_time || null,
         end: workingHourData.end_time || null,
+        arrayServices: workingHourData.service_id || null
     });
 
     useEffect(() => {
-        console.log('workingHourData:', workingHourData);
         setData({
             day: workingHourData.key,
             start: workingHourData.start_time || null,
             end: workingHourData.end_time || null,
+            arrayServices: workingHourData.service_id || null
         });
     }, [workingHourData]);
 
     const handleIntervalSelection = async (formData) => {
-        console.log({ ...formData, employee_id: user.id });
-
+        let service = null;
+        if(formData.arrayServices.length > 0){
+            service = formData.arrayServices[0].id
+        }
         const body = {
             day: workingHourData.key,
             end: formData.txtEndHour,
-            start: formData.txtStartHour
+            start: formData.txtStartHour,
+            arrayServices: service
         }
 
         try {
@@ -113,6 +128,8 @@ export default function WorkingHoursForm({ intervals, workingHour, user, allDays
     };
 
     const applyEveryDay = () => {
+        console.log('🚀 ~ applyEveryDay ~ workingHourData:', workingHourData);
+        console.log('🚀 ~ applyEveryDay ~ workingHourData:', data);
         post(route('admin.working-hours.every-day', { id: user.id }), {
             preserveState: true,
             preserveScroll: true,
@@ -158,8 +175,6 @@ export default function WorkingHoursForm({ intervals, workingHour, user, allDays
 
     const typeRecordValue = useWatch({ control, name: "typeRecord" });
 
-    const [rdDisabledID, setRdDisabledID] = useState(null);
-    const [mainBoxExpanded, setMainBoxExpanded] = useState(false);
 
     const handleExpandedMainBox = () => {
         reset();
@@ -168,8 +183,6 @@ export default function WorkingHoursForm({ intervals, workingHour, user, allDays
         setMainBoxExpanded(!mainBoxExpanded);
     };
 
-    const [editObjectID, setEditObjectID] = useState(null);
-    const [objecDayDataCreated, setObjectDayDataCreated] = useState([]);
 
     const onSubmit = (formData) => {
         if (typeRecordValue?.id === rdOptions[1].id) {

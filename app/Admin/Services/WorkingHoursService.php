@@ -25,14 +25,13 @@ class WorkingHoursService
         if ($user) {
             $workingHours = WorkingHour::where('user_id', $user->id)->get();
         }
-
         // Map the fetched data to the default days of the week
         foreach ($workingHours as $workingHour) {
             $index = $workingHour->day_of_week;
+            $daysOfWeek[$index]['service_id'] = $workingHour->service_id;
             $daysOfWeek[$index]['start_time'] = substr($workingHour->start_time, 0, 5);
             $daysOfWeek[$index]['end_time'] = substr($workingHour->end_time, 0, 5);
         }
-
         // Sort data from Monday (1) to Sunday (0)
         return collect($daysOfWeek)->sortBy(function ($item) {
             // Adjust the sorting order so that Sunday (0) comes last
